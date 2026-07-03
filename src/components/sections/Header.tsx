@@ -3,8 +3,10 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Sun, Moon } from "lucide-react";
+import Image from "next/image";
 import { navItems } from "@/lib/data";
 import { useScrollspy } from "@/hooks/use-scroll";
+import logoImage from "@/assets/images/logo.png";
 
 type Theme = "dark" | "light";
 
@@ -120,37 +122,17 @@ export default function Header() {
                 e.preventDefault();
                 handleNavClick("#home");
               }}
-              className="flex items-center gap-3 group"
+              className="flex items-center gap-5 group"
             >
-              <div className="w-11 h-11 border border-white/[0.15] rounded-md flex items-center justify-center bg-white/[0.03] group-hover:border-white/[0.3] transition-all duration-300">
-                <svg
-                  viewBox="0 0 40 40"
-                  className="w-7 h-7"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M6 32 L13 8 L20 32 M9.5 24 L16.5 24"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M30 12 C25 12, 22 16, 22 21 C22 27, 26 32, 31 32 C34 32, 36 30, 36 27"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M27 21 L36 21"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                  />
-                </svg>
+              <div className="w-11 h-11 border border-white/[0.15] rounded-md flex items-center justify-center bg-white/[0.03] group-hover:border-white/[0.3] transition-all duration-300 overflow-hidden">
+                <Image
+                  src={logoImage.src}
+                  alt="Ahmed ElGabbas logo"
+                  width={44}
+                  height={44}
+                  className="w-full h-full object-contain"
+                  style={{ objectFit: "contain" }}
+                />
               </div>
               <div className="flex flex-col items-start">
                 <div className="font-bold uppercase tracking-[0.35em] text-sm text-white">
@@ -159,7 +141,7 @@ export default function Header() {
                 <div className="flex items-center gap-1 mt-1">
                   <span className="w-5 h-px bg-white opacity-40" />
                   <span className="text-[10px] uppercase tracking-[0.150em] text-white/50 font-medium">
-                    // software engineer //
+                    {"// software engineer //"}
                   </span>
                 </div>
               </div>
@@ -197,14 +179,13 @@ export default function Header() {
             </nav>
 
             {/* Contact Button + Theme Toggle + Mobile Toggle */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 lg:ml-8">
               <button
                 type="button"
                 onClick={handleContactClick}
-                className="hidden md:inline-flex items-center px-5 py-2 rounded-md border border-white/[0.12] bg-transparent font-mono text-[10px] tracking-[0.2em] uppercase text-neutral-300 hover:bg-white/[0.05] hover:border-white/[0.25] hover:text-white transition-all duration-300 relative overflow-hidden group"
+                className="hidden md:inline-flex items-center px-5 py-2 rounded-md border border-neutral-200 bg-white font-mono text-[10px] tracking-[0.2em] uppercase text-black hover:bg-neutral-200 hover:border-neutral-300 hover:text-black transition-all duration-300"
               >
-                <span className="relative z-10">Contact</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.05] to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                <span>Contact</span>
               </button>
 
               <button

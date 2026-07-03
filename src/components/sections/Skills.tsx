@@ -4,23 +4,6 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { SectionHeading } from "@/components/ui/shared";
 import { skillCategories } from "@/lib/data";
-import {
-  Code,
-  Layout,
-  Smartphone,
-  Server,
-  Database,
-  Wrench,
-} from "lucide-react";
-
-const iconMap: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
-  code: Code,
-  layout: Layout,
-  smartphone: Smartphone,
-  server: Server,
-  database: Database,
-  wrench: Wrench,
-};
 
 const levelMap: Record<number, string> = {
   0: "SYS_MASTER",

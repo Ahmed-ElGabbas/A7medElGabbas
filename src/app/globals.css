@@ -1,11 +1,13 @@
 @import "tailwindcss";
 
 @theme {
+  /* === Font families === */
   --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Syne", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
   --font-name: "Playfair Display", ui-serif, Georgia, serif;
 
+  /* === Brand colors === */
   --color-background: #080808;
   --color-foreground: #fafafa;
   --color-muted: #a0a0a0;
@@ -16,6 +18,39 @@
   --color-card-hover: #141414;
   --color-accent: #ffffff;
   --color-surface: #111111;
+
+  /* === Hero design tokens (Section 9 of the spec) === */
+  --color-bg-base: #08090c;
+  --color-surface-1: #101214;
+  --color-surface-2: #1b2628;
+  --color-surface-3: #173735;
+  --color-border-hero: #2a2c2e;
+  --color-border-hero-2: #3a3b3e;
+  --color-divider: #2a2b2e;
+  --color-primary: #1fbea2;
+  --color-primary-bright: #3fcbb0;
+  --color-primary-deep: #0fa98a;
+  --color-primary-eyebrow: #2fc0a0;
+  --color-heading: #fdfdfd;
+  --color-body: #8a8b8f;
+  --color-muted-stat: #6c6d71;
+  --color-faint: #5a5b60;
+  --color-faintest: #48494d;
+  --color-code-keyword: #7da9d8;
+  --color-code-key: #d19a6a;
+  --color-code-string: #8fd19e;
+  --color-code-punct: #c7c8ca;
+  --color-traffic-red: #d5746e;
+  --color-traffic-yellow: #c5af5a;
+  --color-traffic-green: #43b489;
+
+  /* === Animation tokens (Section 17) === */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+  --duration-slow: 500ms;
+  --duration-ambient: 5.5s;
 }
 
 @layer base {
@@ -75,14 +110,23 @@
     padding: 0 24px;
   }
 
+  /* Wider container for the Hero (per Section 2 of the spec) */
+  .section-container-hero {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
   @media (min-width: 768px) {
-    .section-container {
+    .section-container,
+    .section-container-hero {
       padding: 0 48px;
     }
   }
 
   @media (min-width: 1280px) {
-    .section-container {
+    .section-container,
+    .section-container-hero {
       padding: 0 64px;
     }
   }
@@ -122,6 +166,31 @@
     border-color: rgba(255, 255, 255, 0.12);
   }
 
+  /* === Hero glow utilities (Section 10) === */
+  .shadow-glow-teal {
+    box-shadow: 0 0 50px rgba(63, 203, 176, 0.25), 0 0 100px rgba(31, 190, 162, 0.12);
+  }
+
+  .shadow-glow-teal-soft {
+    box-shadow: 0 0 28px rgba(63, 203, 176, 0.18);
+  }
+
+  .shadow-drop-soft {
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  }
+
+  .shadow-card-soft {
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+  }
+
+  .shadow-btn-teal {
+    box-shadow: 0 8px 24px rgba(31, 190, 162, 0.35);
+  }
+
+  .shadow-btn-teal-hover {
+    box-shadow: 0 12px 32px rgba(31, 190, 162, 0.45);
+  }
+
   .glow-sm {
     box-shadow: 0 0 20px rgba(255, 255, 255, 0.03);
   }
@@ -154,12 +223,25 @@
     -webkit-text-fill-color: transparent;
   }
 
+  /* === Animations (Section 13) === */
   .animate-float {
     animation: float 6s ease-in-out infinite;
   }
 
+  .animate-float-soft {
+    animation: float-soft 5.5s ease-in-out infinite;
+  }
+
   .animate-pulse-slow {
     animation: pulse-slow 4s ease-in-out infinite;
+  }
+
+  .animate-badge-pulse {
+    animation: badge-pulse 2s ease-in-out infinite;
+  }
+
+  .animate-scroll-dot {
+    animation: scroll-dot 1.5s ease-in-out infinite;
   }
 }
 
@@ -172,12 +254,46 @@
   }
 }
 
+@keyframes float-soft {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
 @keyframes pulse-slow {
   0%, 100% {
     opacity: 0.4;
   }
   50% {
     opacity: 0.8;
+  }
+}
+
+@keyframes badge-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(1.18);
+  }
+}
+
+@keyframes scroll-dot {
+  0% {
+    transform: translateY(-6px);
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(6px);
+    opacity: 0;
   }
 }
 

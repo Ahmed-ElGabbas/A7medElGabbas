@@ -23,7 +23,7 @@ export function SectionHeading({
         transition={{ duration: 0.5 }}
         className="font-mono text-[11px] tracking-[0.25em] uppercase text-neutral-500 mb-6"
       >
-        {index} // {label}
+        {index} {"//"} {label}
       </motion.p>
       <motion.h2
         initial={{ opacity: 0, y: 20 }}

@@ -1,5 +1,35 @@
 import type { Metadata } from "next";
+import {
+  JetBrains_Mono,
+  Playfair_Display,
+  Space_Grotesk,
+  Syne,
+} from "next/font/google";
 import "./globals.css";
+
+// next/font/google replaces the previous <link> tags — eliminates the
+// @next/next/no-page-custom-font lint warning and gives us automatic
+// font-display: swap, preloading, and CSS-variable exposure to Tailwind @theme.
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
+const syne = Syne({
+  subsets: ["latin"],
+  variable: "--font-display",
+  display: "swap",
+});
+const jetBrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
+});
+const playfairDisplay = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-name",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Ahmed ElGabbas — Full-Stack Developer & Mobile Engineer",
@@ -38,18 +68,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="scroll-smooth dark">
+    <html
+      lang="en"
+      className={`${spaceGrotesk.variable} ${syne.variable} ${jetBrainsMono.variable} ${playfairDisplay.variable} scroll-smooth dark`}
+    >
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:ital,wght@0,400;0,500;1,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
-          rel="stylesheet"
-        />
         <script
           dangerouslySetInnerHTML={{
             __html: "(function(){try{var t=localStorage.getItem('theme');if(t==='light'){document.documentElement.classList.remove('dark');document.documentElement.classList.add('light');}else{document.documentElement.classList.add('dark');}}catch(e){document.documentElement.classList.add('dark');}})();",

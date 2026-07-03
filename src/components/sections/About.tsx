@@ -31,7 +31,7 @@ export default function About() {
             transition={{ duration: 0.6 }}
           >
             <p className="text-neutral-400 text-lg md:text-xl leading-relaxed mb-4">
-              Hi, I'm Ahmed Mahmoud Ahmed Elgabbas, a Computer Science and Artificial Intelligence student at Helwan National University specializing in Robotics Software Engineering. I am a passionate Software and Mobile Application Developer with a strong foundation in programming, problem-solving, and software architecture.
+              Hi, I&apos;m Ahmed Mahmoud Ahmed Elgabbas, a Computer Science and Artificial Intelligence student at Helwan National University specializing in Robotics Software Engineering. I am a passionate Software and Mobile Application Developer with a strong foundation in programming, problem-solving, and software architecture.
             </p>
             <p className="text-neutral-400 text-lg md:text-xl leading-relaxed mb-4">
               Beyond technical expertise, I Member of HR Committee at HNU-FCSIT ICPC Community and Head of Sports Committee at HNU-FCSIT Student Union. These leadership roles have strengthened my abilities in team management, event organization, and fostering collaborative environments. I am passionate about continuous learning, problem-solving, and delivering impactful solutions.

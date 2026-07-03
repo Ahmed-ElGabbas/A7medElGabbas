@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { SectionHeading, GradientDivider } from "@/components/ui/shared";
+import { SectionHeading } from "@/components/ui/shared";
 import { siteConfig } from "@/lib/data";
 import { MapPin, Phone, Mail, Github, Send } from "lucide-react";
 

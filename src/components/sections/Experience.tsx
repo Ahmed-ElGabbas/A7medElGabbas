@@ -45,7 +45,7 @@ export default function Experience() {
                 </span>
               </motion.div>
 
-              {education.map((edu, i) => (
+              {education.map((edu) => (
                 <motion.div
                   key={edu.degree}
                   initial={{ opacity: 0, y: 20 }}

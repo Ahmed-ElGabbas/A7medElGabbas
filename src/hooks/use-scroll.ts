@@ -19,7 +19,7 @@ export function useScrollspy(ids: string[], offset = 100) {
   }, [ids, offset]);
 
   useEffect(() => {
-    handleScroll();
+    queueMicrotask(handleScroll);
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
@@ -33,7 +33,7 @@ export function useMediaQuery(query: string) {
   useEffect(() => {
     const media = window.matchMedia(query);
     if (media.matches !== matches) {
-      setMatches(media.matches);
+      queueMicrotask(() => setMatches(media.matches));
     }
     const listener = () => setMatches(media.matches);
     media.addEventListener("change", listener);
