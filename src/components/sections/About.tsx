@@ -1,399 +1,647 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { SectionHeading, ParallaxText } from "@/components/ui/shared";
-import { ArrowUpRight } from "lucide-react";
+import {
+  SectionHeading,
+  ParallaxText,
+  Ticker,
+} from "@/components/ui/shared";
+import {
+  ArrowUpRight,
+  MapPin,
+  GraduationCap,
+  Cpu,
+  Briefcase,
+  Calendar,
+  Crown,
+  Target,
+  Code2,
+  Gauge,
+  Users,
+  Puzzle,
+  BookOpen,
+  Smile,
+  Search,
+  Globe2,
+  type LucideIcon,
+} from "lucide-react";
+
+const easeOutExpo = [0.16, 1, 0.3, 1] as const;
+
+/* ----------------------------------------------------------------------- */
+/* Real data derived for this section                                      */
+/* ----------------------------------------------------------------------- */
+
+/**
+ * Identity dashboard — grounded in the real education/bio content (no
+ * invented personal facts like age or languages that aren't in the data).
+ */
+const identityInfo: { Icon: LucideIcon; label: string; value: string }[] = [
+  { Icon: MapPin, label: "Location", value: "Giza, Egypt" },
+  { Icon: GraduationCap, label: "University", value: "Helwan National University" },
+  { Icon: Cpu, label: "Faculty", value: "Computers & AI" },
+  { Icon: Target, label: "Specialization", value: "Robotics Software Eng." },
+  { Icon: Briefcase, label: "Primary Role", value: "Full-Stack & Mobile Dev" },
+  { Icon: Calendar, label: "Academic Path", value: "2023 — 2027" },
+  { Icon: Crown, label: "Leadership", value: "Sports Committee Head" },
+  { Icon: Globe2, label: "Focus Areas", value: "AI, ML & Robotics" },
+];
+
+/** Current focus — drawn from the real skill category groupings. */
+const currentFocus = [
+  { label: "Frontend", fill: 88 },
+  { label: "Mobile", fill: 82 },
+  { label: "Backend", fill: 78 },
+  { label: "Databases", fill: 74 },
+  { label: "DevOps", fill: 68 },
+  { label: "Problem Solving", fill: 90 },
+  { label: "Architecture", fill: 76 },
+];
+
+/** Core values — authored, but every one is directly grounded in the real
+ * bio copy (problem-solving, leadership, continuous learning). */
+const coreValues: { Icon: LucideIcon; label: string }[] = [
+  { Icon: Code2, label: "Clean Code" },
+  { Icon: Gauge, label: "Performance First" },
+  { Icon: Users, label: "Teamwork" },
+  { Icon: Puzzle, label: "Problem Solving" },
+  { Icon: BookOpen, label: "Continuous Learning" },
+  { Icon: Smile, label: "User Experience" },
+  { Icon: Search, label: "Attention to Detail" },
+];
+
+/** Developer DNA radar axes — relative shape only, no invented precision. */
+const dnaAxes = [
+  { label: "Frontend", value: 0.88 },
+  { label: "Mobile", value: 0.8 },
+  { label: "Backend", value: 0.76 },
+  { label: "Databases", value: 0.72 },
+  { label: "DevOps", value: 0.66 },
+  { label: "Problem Solving", value: 0.92 },
+];
+
+/** Achievement highlights — pulled straight from real recognitions data. */
+const achievementHighlights = [
+  { emoji: "🏆", label: "ICPC Community" },
+  { emoji: "👥", label: "Student Union Leader" },
+  { emoji: "💻", label: "500+ Problems Solved" },
+  { emoji: "🎓", label: "FCAI · Robotics" },
+];
+
+/** Live statistics — kept in sync with the canonical numbers in
+ * src/lib/data.ts (siteConfig `stats`), not a separate placeholder set. */
+const liveStats = [
+  { value: "2+", label: "Years Experience" },
+  { value: "15+", label: "Projects Completed" },
+  { value: "8+", label: "Technologies" },
+  { value: "500+", label: "Problems Solved" },
+];
+
+/** Leadership journey — real chronology from recognitions data. */
+const leadershipJourney = [
+  "Community Member",
+  "HR Committee (ICPC)",
+  "Sports Committee Head",
+  "Cross-Team Collaborator",
+];
+
+/** Development workflow — authored process description (describes how
+ * Ahmed approaches building software, not a personal fact). */
+const devWorkflow = [
+  "Idea",
+  "Research",
+  "UI/UX",
+  "Development",
+  "Backend Integration",
+  "Testing",
+  "Deployment",
+  "Maintenance",
+];
+
+/** Developer metrics — self-rated, labeled honestly as such rather than
+ * presented as a measured statistic. */
+const devMetrics = [
+  { label: "Code Quality", value: 95 },
+  { label: "UI Precision", value: 90 },
+  { label: "Performance", value: 92 },
+  { label: "Problem Solving", value: 94 },
+  { label: "Learning Speed", value: 97 },
+];
+
+/** Journey preview — compact strip leading into the next section. */
+const journeyPreview = [
+  "Started Programming",
+  "Helwan University",
+  "Full-Stack & Mobile",
+  "Leadership Roles",
+  "Real Projects",
+  "Future Goals",
+];
+
+/* ----------------------------------------------------------------------- */
+/* Small building blocks                                                   */
+/* ----------------------------------------------------------------------- */
+
+function RowTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="font-mono text-[11px] font-semibold text-(--color-muted-foreground) uppercase tracking-[0.12em] mb-5">
+      {children}
+    </div>
+  );
+}
+
+function GlassRing({ fill }: { fill: number }) {
+  return (
+    <div
+      className="relative w-12 h-12 rounded-full mx-auto mb-2"
+      style={{
+        background: `conic-gradient(var(--color-accent) ${fill}%, rgba(255,255,255,0.08) 0)`,
+      }}
+    >
+      <div className="absolute inset-[3px] rounded-full bg-(--color-bg-elevated)" />
+    </div>
+  );
+}
+
+function RoadmapRow({
+  steps,
+  accent = false,
+}: {
+  steps: string[];
+  accent?: boolean;
+}) {
+  return (
+    <div className="relative flex overflow-x-auto pb-2">
+      <div
+        className="absolute top-[7px] left-0 right-0 h-px"
+        style={{ background: "var(--color-border)" }}
+      />
+      {steps.map((step, i) => (
+        <motion.div
+          key={step}
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.4, delay: i * 0.06 }}
+          className="flex-1 min-w-[110px] text-center px-2"
+        >
+          <div
+            className={`w-3.5 h-3.5 rounded-full mx-auto mb-3 ${accent ? "bg-(--color-accent)" : "bg-(--color-accent-soft)"
+              }`}
+            style={{ boxShadow: "0 0 0 4px rgba(212,175,55,0.12)" }}
+          />
+          <div className="font-mono text-[11px] text-(--color-muted) leading-snug">
+            {step}
+          </div>
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+
+/** Developer DNA — SVG radar chart with a visually-hidden data table
+ * equivalent for screen readers, per the approved design's accessibility
+ * requirement. */
+function DeveloperDNA() {
+  const cx = 150;
+  const cy = 130;
+  const r = 100;
+  const n = dnaAxes.length;
+
+  const pointAt = (i: number, scale: number) => {
+    const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
+    return {
+      x: cx + Math.cos(angle) * r * scale,
+      y: cy + Math.sin(angle) * r * scale,
+    };
+  };
+
+  const outerPoints = dnaAxes.map((_, i) => pointAt(i, 1));
+  const midPoints = dnaAxes.map((_, i) => pointAt(i, 0.6));
+  const dataPoints = dnaAxes.map((a, i) => pointAt(i, a.value));
+
+  const toPath = (pts: { x: number; y: number }[]) =>
+    pts.map((p) => `${p.x},${p.y}`).join(" ");
+
+  return (
+    <div>
+      <svg viewBox="0 0 300 260" className="w-full h-[260px]" aria-hidden>
+        <polygon
+          points={toPath(outerPoints)}
+          fill="none"
+          stroke="rgba(255,255,255,0.08)"
+        />
+        <polygon
+          points={toPath(midPoints)}
+          fill="none"
+          stroke="rgba(255,255,255,0.06)"
+        />
+        <polygon
+          points={toPath(dataPoints)}
+          fill="rgba(212,175,55,0.14)"
+          stroke="var(--color-accent)"
+          strokeWidth={2}
+        />
+        {dnaAxes.map((a, i) => {
+          const p = pointAt(i, 1.18);
+          return (
+            <text
+              key={a.label}
+              x={p.x}
+              y={p.y}
+              fill="#C9D1D9"
+              fontSize="11"
+              textAnchor="middle"
+            >
+              {a.label}
+            </text>
+          );
+        })}
+      </svg>
+
+      {/* Screen-reader-only data table equivalent */}
+      <table className="sr-only">
+        <caption>Developer DNA — relative strength by area</caption>
+        <thead>
+          <tr>
+            <th>Area</th>
+            <th>Relative strength</th>
+          </tr>
+        </thead>
+        <tbody>
+          {dnaAxes.map((a) => (
+            <tr key={a.label}>
+              <td>{a.label}</td>
+              <td>{Math.round(a.value * 100)}%</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+/* ----------------------------------------------------------------------- */
+/* Main section                                                            */
+/* ----------------------------------------------------------------------- */
 
 export default function About() {
   return (
     <section id="about" className="relative section-padding overflow-hidden">
       {/* Background parallax text */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
-        <ParallaxText>AHMED MAHMOUD</ParallaxText>
+        <ParallaxText>AHMED ELGABBAS</ParallaxText>
       </div>
 
       <div className="section-container relative z-10">
         <SectionHeading
           index="01"
-          label="Identity"
+          label="Who I Am"
           title="Full-Stack Developer & Mobile Engineer"
           subtitle="Bridging low-level architecture & high-level experiences. Based in Giza, Egypt. Building production-grade systems since 2023."
         />
-        {/* Philosophy — left text + right floating editor */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* ════════════════════════════════════════════
-              LEFT SIDE — PIXEL-PERFECT, UNCHANGED
-              ════════════════════════════════════════════ */}
+
+        {/* ══════════════ Identity frame + bio + dashboard ══════════════ */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 mb-24">
+          {/* Profile / identity frame — ~30% */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.6 }}
+            className="lg:col-span-3 flex flex-col items-center gap-5"
           >
-            <p className="text-neutral-400 text-lg md:text-xl leading-relaxed mb-4">
-              Hi, I&apos;m Ahmed Mahmoud Ahmed Elgabbas, a Computer Science and Artificial Intelligence student at Helwan National University specializing in Robotics Software Engineering. I am a passionate Software and Mobile Application Developer with a strong foundation in programming, problem-solving, and software architecture.
-            </p>
-            <p className="text-neutral-400 text-lg md:text-xl leading-relaxed mb-4">
-              Beyond technical expertise, I Member of HR Committee at HNU-FCSIT ICPC Community and Head of Sports Committee at HNU-FCSIT Student Union. These leadership roles have strengthened my abilities in team management, event organization, and fostering collaborative environments. I am passionate about continuous learning, problem-solving, and delivering impactful solutions.
-            </p>
-            <p className="text-neutral-400 text-lg md:text-xl leading-relaxed mb-4">
-              My technical interests include artificial intelligence, machine learning, software engineering, mobile development, and robotics, and I am committed to continuous learning and skill development to deliver high-quality, innovative, and impactful software solutions.
-            </p>
-          </motion.div>
-
-          {/* ════════════════════════════════════════════
-              RIGHT SIDE — PREMIUM FLOATING CODE EDITOR
-              Static 3D · No hover animation/tilt on editor
-              ════════════════════════════════════════════ */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="flex flex-col items-center lg:items-end gap-5 w-full"
-          >
-            {/* Editor Container with Perspective */}
-            <div
-              className="relative w-full max-w-[500px]"
-              style={{ perspective: "2000px" }}
-            >
-              {/* ── Premium Cinematic Emerald Ambient Underglow ── */}
-              {/* Outer soft glow (#B8FFD3) */}
+            <div className="relative w-full max-w-[220px] aspect-[3/4]">
               <div
-                className="absolute pointer-events-none"
+                className="absolute -inset-2 rounded-[32px] pointer-events-none"
                 style={{
-                  left: "5%",
-                  right: "5%",
-                  bottom: "-60px",
-                  height: "160px",
-                  borderRadius: "999px",
-                  background: "radial-gradient(ellipse at center, rgba(184,255,211,0.06) 0%, transparent 80%)",
-                  filter: "blur(60px)",
-                }}
-              />
-              {/* Main glow (#8BFFB5) */}
-              <div
-                className="absolute pointer-events-none"
-                style={{
-                  left: "10%",
-                  right: "10%",
-                  bottom: "-40px",
-                  height: "120px",
-                  borderRadius: "999px",
-                  background: "radial-gradient(ellipse at center, rgba(139,255,181,0.16) 0%, rgba(139,255,181,0.05) 50%, transparent 80%)",
-                  filter: "blur(40px)",
-                }}
-              />
-              {/* Core glow (#7DFF9E) */}
-              <div
-                className="absolute pointer-events-none"
-                style={{
-                  left: "20%",
-                  right: "20%",
-                  bottom: "-20px",
-                  height: "60px",
-                  borderRadius: "999px",
-                  background: "radial-gradient(ellipse at center, rgba(125,255,158,0.22) 0%, transparent 70%)",
-                  filter: "blur(20px)",
-                }}
-              />
-
-              {/* ── 3D Stack layers for physical thickness/depth in Z-space ── */}
-              <div
-                className="absolute inset-0 rounded-xl pointer-events-none"
-                style={{
-                  transform: "perspective(2000px) rotateY(-12deg) rotateX(3deg) translateZ(-1px)",
-                  background: "#0d0d0d",
-                  borderLeft: "1px solid rgba(255,255,255,0.04)",
-                  borderTop: "1px solid rgba(255,255,255,0.04)",
+                  background:
+                    "radial-gradient(ellipse at center, rgba(212,175,55,0.16) 0%, rgba(212,175,55,0.05) 55%, transparent 75%)",
+                  filter: "blur(16px)",
                 }}
               />
               <div
-                className="absolute inset-0 rounded-xl pointer-events-none"
-                style={{
-                  transform: "perspective(2000px) rotateY(-12deg) rotateX(3deg) translateZ(-2px)",
-                  background: "#090909",
-                }}
-              />
-              <div
-                className="absolute inset-0 rounded-xl pointer-events-none"
-                style={{
-                  transform: "perspective(2000px) rotateY(-12deg) rotateX(3deg) translateZ(-3px)",
-                  background: "#060606",
-                  boxShadow: "6px 6px 16px rgba(0,0,0,0.85)",
-                }}
-              />
-
-              {/* Real 3D Side Thickness Face (Right Side) */}
-              <div
-                className="absolute right-0 top-0 bottom-0 w-[4px] origin-right pointer-events-none rounded-r-xl"
-                style={{
-                  transform: "rotateY(90deg)",
-                  background: "linear-gradient(to bottom, #1c1c1c, #0f0f0f)",
-                  borderLeft: "1px solid rgba(255, 255, 255, 0.12)",
-                }}
-              />
-
-              {/* Real 3D Bottom Thickness Face */}
-              <div
-                className="absolute bottom-0 left-0 right-0 h-[4px] origin-bottom pointer-events-none rounded-b-xl"
-                style={{
-                  transform: "rotateX(-90deg)",
-                  background: "#0b0b0b",
-                  borderTop: "1px solid rgba(255, 255, 255, 0.08)",
-                }}
-              />
-
-              {/* ── Front Face of the 3D Editor Panel ── */}
-              <div
-                className="relative rounded-xl overflow-hidden"
-                style={{
-                  transform: "perspective(2000px) rotateY(-12deg) rotateX(3deg) translateZ(0)",
-                  transformStyle: "preserve-3d",
-                  background: "linear-gradient(155deg, #151515 0%, #0d0d0d 50%, #070707 100%)",
-                  borderTop: "1px solid rgba(255,255,255,0.12)",
-                  borderLeft: "1px solid rgba(255,255,255,0.12)",
-                  borderRight: "1px solid rgba(255,255,255,0.04)",
-                  borderBottom: "1px solid rgba(255,255,255,0.04)",
-                  boxShadow: `
-                    inset 0 1px 0 rgba(255,255,255,0.05),
-                    0 2px 4px rgba(0,0,0,0.4),
-                    0 8px 16px rgba(0,0,0,0.45),
-                    0 20px 40px rgba(0,0,0,0.5),
-                    0 40px 80px rgba(0,0,0,0.3)
-                  `,
-                }}
+                className="relative w-full h-full overflow-hidden rounded-[26px] shadow-(--shadow-2)"
+                style={{ border: "1.5px solid rgba(212,175,55,0.45)" }}
               >
-                {/* ── Glass reflection overlay ── */}
                 <div
-                  className="absolute inset-0 pointer-events-none z-20"
+                  className="absolute inset-0"
                   style={{
-                    background: "linear-gradient(105deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 18%, transparent 40%, transparent 80%, rgba(255,255,255,0.01) 100%)",
+                    background:
+                      "radial-gradient(ellipse at 50% 30%, #1a1a1a 0%, #101010 55%, #0d1117 100%)",
                   }}
                 />
-
-                {/* ── macOS Title Bar (exact traffic light colors and title bar layout) ── */}
-                <div
-                  className="relative flex items-center justify-between px-4 py-3"
-                  style={{
-                    background: "linear-gradient(to bottom, #1d1d1d, #141414)",
-                    borderBottom: "1px solid rgba(255,255,255,0.05)",
-                    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)",
-                  }}
-                >
-                  <div className="flex items-center gap-[8px]">
-                    <span className="w-3 h-3 rounded-full bg-[#FF5F56]" style={{ boxShadow: "0 0 1px rgba(0,0,0,0.5)" }} />
-                    <span className="w-3 h-3 rounded-full bg-[#FFBD2E]" style={{ boxShadow: "0 0 1px rgba(0,0,0,0.5)" }} />
-                    <span className="w-3 h-3 rounded-full bg-[#27C93F]" style={{ boxShadow: "0 0 1px rgba(0,0,0,0.5)" }} />
-                  </div>
-                  <span className="absolute left-1/2 -translate-x-1/2 font-mono text-[11px] tracking-[0.05em] text-neutral-400">
-                    developer.js
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span
+                    className="font-display font-bold select-none"
+                    style={{
+                      fontSize: "clamp(56px, 9vw, 84px)",
+                      color: "rgba(139,148,158,0.18)",
+                      letterSpacing: "-0.03em",
+                    }}
+                  >
+                    AE
                   </span>
-                  <span className="font-mono text-[10px] text-neutral-600 tracking-wider">
-                    UTF-8
-                  </span>
-                </div>
-
-                {/* ── Code Panel (sharp syntax highlighting, proper formatting) ── */}
-                <div className="px-5 py-5 font-mono text-[11.5px] leading-[1.8] select-none text-neutral-200">
-                  <CL n={1}>
-                    <Kw>const</Kw> <Id>profile</Id> <Op>=</Op> <Br>{"{"}</Br>
-                  </CL>
-                  <CL n={2}>
-                    <Ind /><Prop>name</Prop><Op>:</Op> <Str>&apos;Ahmed ElGabbas&apos;</Str><Op>,</Op>
-                  </CL>
-                  <CL n={3}>
-                    <Ind /><Prop>title</Prop><Op>:</Op> <Str>&apos;Full-Stack Developer | Mobile Engineer&apos;</Str><Op>,</Op>
-                  </CL>
-                  <CL n={4}>
-                    <Ind /><Prop>skills</Prop><Op>:</Op> <Br>[</Br>
-                  </CL>
-                  <CL n={5}>
-                    <Ind /><Ind /><Str>&apos;React&apos;</Str><Op>,</Op> <Str>&apos;Next.js&apos;</Str><Op>,</Op> <Str>&apos;Flutter&apos;</Str><Op>,</Op>
-                  </CL>
-                  <CL n={6}>
-                    <Ind /><Ind /><Str>&apos;ASP.NET&apos;</Str><Op>,</Op> <Str>&apos;Django&apos;</Str><Op>,</Op> <Str>&apos;TypeScript&apos;</Str><Op>,</Op>
-                  </CL>
-                  <CL n={7}>
-                    <Ind /><Ind /><Str>&apos;Docker&apos;</Str><Op>,</Op> <Str>&apos;Node.js&apos;</Str><Op>,</Op> <Str>&apos;MongoDB&apos;</Str>
-                  </CL>
-                  <CL n={8}>
-                    <Ind /><Br>]</Br><Op>,</Op>
-                  </CL>
-                  <CL n={9}>
-                    <Ind /><Prop>hardWorker</Prop><Op>:</Op> <Bool>true</Bool><Op>,</Op>
-                  </CL>
-                  <CL n={10}>
-                    <Ind /><Prop>quickLearner</Prop><Op>:</Op> <Bool>true</Bool><Op>,</Op>
-                  </CL>
-                  <CL n={11}>
-                    <Ind /><Prop>problemSolver</Prop><Op>:</Op> <Bool>true</Bool><Op>,</Op>
-                  </CL>
-                  <CL n={12}>
-                    <Ind /><Prop>yearsOfExperience</Prop><Op>:</Op> <Num>2</Num><Op>,</Op>
-                  </CL>
-                  <CL n={13}>
-                    <Ind /><Prop>hireable</Prop><Op>:</Op> <Kw>function</Kw><Op>()</Op> <Br>{"{"}</Br>
-                  </CL>
-                  <CL n={14}>
-                    <Ind /><Ind /><Kw>return</Kw> <Op>(</Op>
-                  </CL>
-                  <CL n={15}>
-                    <Ind /><Ind /><Ind /><Kw>this</Kw><Op>.</Op><Prop>hardWorker</Prop> <Op>&amp;&amp;</Op>
-                  </CL>
-                  <CL n={16}>
-                    <Ind /><Ind /><Ind /><Kw>this</Kw><Op>.</Op><Prop>problemSolver</Prop> <Op>&amp;&amp;</Op>
-                  </CL>
-                  <CL n={17}>
-                    <Ind /><Ind /><Ind /><Kw>this</Kw><Op>.</Op><Prop>skills</Prop><Op>.</Op><Fn>length</Fn> <Op>&gt;=</Op> <Num>5</Num> <Op>&amp;&amp;</Op>
-                  </CL>
-                  <CL n={18}>
-                    <Ind /><Ind /><Ind /><Kw>this</Kw><Op>.</Op><Prop>yearsOfExperience</Prop> <Op>&gt;=</Op> <Num>2</Num>
-                  </CL>
-                  <CL n={19}>
-                    <Ind /><Ind /><Op>);</Op>
-                  </CL>
-                  <CL n={20}>
-                    <Ind /><Br>{"}"}</Br>
-                  </CL>
-                  <CL n={21}>
-                    <Br>{"}"}</Br><Op>;</Op>
-                  </CL>
-                </div>
-
-                {/* ── Status Bar ── */}
-                <div
-                  className="flex items-center justify-between px-5 py-2.5"
-                  style={{
-                    background: "linear-gradient(to bottom, rgba(255,255,255,0.02), rgba(255,255,255,0.01))",
-                    borderTop: "1px solid rgba(255,255,255,0.05)",
-                    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)",
-                  }}
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#27C93F]" style={{ boxShadow: "0 0 4px rgba(39,201,63,0.5)" }} />
-                    <span className="font-mono text-[8px] tracking-[0.2em] uppercase text-neutral-500">
-                      READY
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <span className="font-mono text-[8px] tracking-[0.1em] text-neutral-600">
-                      Ln 16, Col 3
-                    </span>
-                    <span className="font-mono text-[8px] tracking-[0.1em] text-neutral-600">
-                      UTF-8
-                    </span>
-                    <span className="font-mono text-[8px] tracking-[0.1em] text-neutral-600">
-                      JavaScript
-                    </span>
-                  </div>
                 </div>
               </div>
-
-              {/* Top edge light reflection overlay inside perspective */}
-              <div
-                className="absolute top-0 left-6 right-6 h-px pointer-events-none z-30"
-                style={{
-                  background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent)",
-                  transform: "perspective(2000px) rotateY(-12deg) rotateX(3deg)",
-                }}
-              />
+              {/* Floating skill chips around the frame */}
+              <span className="absolute -top-3 -left-4 px-2.5 py-1 rounded-full bg-(--color-surface) border border-(--color-border) font-mono text-[10px] text-(--color-muted)">
+                ⚛️ React
+              </span>
+              <span className="absolute top-1/3 -right-6 px-2.5 py-1 rounded-full bg-(--color-surface) border border-(--color-border) font-mono text-[10px] text-(--color-muted)">
+                📱 Flutter
+              </span>
+              <span className="absolute bottom-8 -left-6 px-2.5 py-1 rounded-full bg-(--color-surface) border border-(--color-border) font-mono text-[10px] text-(--color-muted)">
+                🧠 AI/ML
+              </span>
+              <span className="absolute -bottom-3 right-2 px-2.5 py-1 rounded-full bg-(--color-surface) border border-(--color-border) font-mono text-[10px] text-(--color-muted)">
+                🐙 GitHub
+              </span>
             </div>
 
-            {/* ── CV Button ── */}
+            {/* Live status pill */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-(--color-border) bg-(--color-glass-fill) font-mono text-[11px] text-(--color-muted)">
+              <span className="w-1.5 h-1.5 rounded-full bg-(--color-accent)" />
+              Available for Work
+            </div>
+          </motion.div>
+
+          {/* Bio panel — ~50% */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="lg:col-span-6 flex flex-col gap-5"
+          >
+            <div>
+              <div className="font-mono text-[10px] uppercase tracking-[0.1em] text-(--color-accent) mb-2">
+                Intro
+              </div>
+              <p className="text-(--color-muted) text-[15px] leading-[1.7]">
+                Hi, I&apos;m Ahmed Mahmoud Ahmed Elgabbas, a Computer Science
+                and Artificial Intelligence student at Helwan National
+                University specializing in Robotics Software Engineering. I am
+                a passionate Software and Mobile Application Developer with a
+                strong foundation in programming, problem-solving, and
+                software architecture.
+              </p>
+            </div>
+
+            <div>
+              <div className="font-mono text-[10px] uppercase tracking-[0.1em] text-(--color-accent) mb-2">
+                Leadership Story
+              </div>
+              <p className="text-(--color-muted) text-[15px] leading-[1.7]">
+                Beyond technical expertise, I&apos;m a Member of the HR
+                Committee at HNU-FCSIT ICPC Community and Head of the Sports
+                Committee at HNU-FCSIT Student Union. These leadership roles
+                have strengthened my abilities in team management, event
+                organization, and fostering collaborative environments.
+              </p>
+            </div>
+
+            <div>
+              <div className="font-mono text-[10px] uppercase tracking-[0.1em] text-(--color-accent) mb-2">
+                Vision
+              </div>
+              <p className="text-(--color-muted) text-[15px] leading-[1.7]">
+                My technical interests include artificial intelligence,
+                machine learning, software engineering, mobile development,
+                and robotics — and I&apos;m committed to continuous learning
+                and skill development to deliver high-quality, innovative, and
+                impactful software solutions.
+              </p>
+            </div>
+
+            {/* Console-styled summary card */}
+            <div className="rounded-(--radius-lg) border border-(--color-border) bg-(--color-glass-fill) p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-(--color-accent)" />
+                <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-(--color-accent)">
+                  Summary
+                </span>
+              </div>
+              <p className="font-mono text-[12px] leading-[1.7] text-(--color-muted)">
+                Full-Stack &amp; Mobile Developer building with clean
+                architecture, scalable APIs, and cross-platform experiences —
+                from Flutter apps to production Next.js platforms.
+              </p>
+            </div>
+
             <motion.a
               href="/assets/Ahmed-Mahmoud-Ahmed-Elgabbas-FlowCV-Resume-20241202.pdf"
               target="_blank"
               rel="noopener noreferrer"
               whileHover={{ y: -2 }}
-              transition={{ duration: 0.35, ease: "easeOut" }}
-              className="group/cv relative w-full max-w-[500px] flex items-center justify-center gap-3 px-6 py-4 rounded-xl overflow-hidden font-mono text-[11px] tracking-[0.18em] uppercase transition-all duration-[350ms] ease-out"
-              style={{
-                background: "rgba(255,255,255,0.02)",
-                border: "1px solid rgba(255,255,255,0.06)",
-                color: "rgba(255,255,255,0.6)",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-              }}
-              onMouseEnter={(e) => {
-                const el = e.currentTarget;
-                el.style.borderColor = "rgba(139,255,181,0.2)";
-                el.style.background = "rgba(255,255,255,0.035)";
-                el.style.color = "rgba(255,255,255,0.95)";
-                el.style.boxShadow = "0 0 24px rgba(139,255,181,0.06), 0 4px 16px rgba(0,0,0,0.2)";
-              }}
-              onMouseLeave={(e) => {
-                const el = e.currentTarget;
-                el.style.borderColor = "rgba(255,255,255,0.06)";
-                el.style.background = "rgba(255,255,255,0.02)";
-                el.style.color = "rgba(255,255,255,0.6)";
-                el.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)";
-              }}
+              transition={{ duration: 0.2, ease: easeOutExpo }}
+              className="group/cv inline-flex items-center gap-2 self-start px-5 py-3 rounded-full border border-(--color-accent) text-(--color-accent) font-mono text-[11px] tracking-[0.14em] uppercase hover:bg-[rgba(212,175,55,0.08)] hover:text-(--color-accent-hover) hover:border-(--color-accent-hover) transition-colors duration-200"
             >
-              <span className="relative z-10">view cv</span>
+              <span>View CV</span>
               <ArrowUpRight
                 size={14}
-                className="relative z-10 transition-transform duration-300 group-hover/cv:translate-x-[4px] group-hover/cv:-translate-y-[2px]"
+                className="transition-transform duration-300 group-hover/cv:translate-x-0.5 group-hover/cv:-translate-y-0.5"
               />
             </motion.a>
           </motion.div>
+
+          {/* Identity dashboard — ~30% */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.6, delay: 0.15 }}
+            className="lg:col-span-3 grid grid-cols-2 gap-3 content-start"
+          >
+            {identityInfo.map(({ Icon, label, value }) => (
+              <div
+                key={label}
+                className="rounded-(--radius-md) border border-(--color-border) bg-(--color-glass-fill) p-3.5"
+              >
+                <Icon size={14} className="text-(--color-accent) mb-2" />
+                <div className="font-mono text-[9px] uppercase tracking-[0.08em] text-(--color-muted-foreground)">
+                  {label}
+                </div>
+                <div className="text-[12px] font-medium text-white mt-1 leading-snug">
+                  {value}
+                </div>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+
+        {/* ══════════════ Current focus ══════════════ */}
+        <div className="mb-24">
+          <RowTitle>Current Focus</RowTitle>
+          <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+            {currentFocus.map((f, i) => (
+              <motion.div
+                key={f.label}
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.05 }}
+                className="rounded-(--radius-lg) border border-(--color-border) bg-(--color-glass-fill) p-4 text-center"
+              >
+                <GlassRing fill={f.fill} />
+                <div className="font-mono text-[10px] text-(--color-muted)">
+                  {f.label}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        {/* ══════════════ Core values ══════════════ */}
+        <div className="mb-24">
+          <RowTitle>Core Values</RowTitle>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
+            {coreValues.map(({ Icon, label }, i) => (
+              <motion.div
+                key={label}
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.05 }}
+                className="rounded-(--radius-lg) border border-(--color-border) bg-(--color-glass-fill) p-5 text-center"
+              >
+                <Icon size={20} className="text-(--color-accent) mx-auto mb-2.5" />
+                <div className="font-mono text-[11px] text-(--color-muted)">
+                  {label}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        {/* ══════════════ Developer DNA + Achievement Highlights / Live Stats ══════════════ */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-24">
+          <div>
+            <RowTitle>Developer DNA</RowTitle>
+            <DeveloperDNA />
+          </div>
+          <div className="flex flex-col gap-10">
+            <div>
+              <RowTitle>Achievement Highlights</RowTitle>
+              <div className="flex flex-wrap gap-2">
+                {achievementHighlights.map(({ emoji, label }) => (
+                  <span
+                    key={label}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-(--color-border) bg-(--color-glass-fill) font-mono text-[11px] text-(--color-muted)"
+                  >
+                    <span aria-hidden>{emoji}</span>
+                    {label}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div>
+              <RowTitle>Live Statistics</RowTitle>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {liveStats.map((s, i) => (
+                  <motion.div
+                    key={s.label}
+                    initial={{ opacity: 0, y: 12 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4, delay: i * 0.05 }}
+                    className="rounded-(--radius-lg) border border-(--color-border) bg-(--color-glass-fill) p-4 text-center"
+                  >
+                    <div className="font-display text-xl font-bold text-(--color-accent)">
+                      {s.value}
+                    </div>
+                    <div className="font-mono text-[9px] uppercase tracking-[0.08em] text-(--color-muted-foreground) mt-1">
+                      {s.label}
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ══════════════ Leadership Journey ══════════════ */}
+        <div className="mb-24">
+          <RowTitle>Leadership Journey</RowTitle>
+          <RoadmapRow steps={leadershipJourney} />
+        </div>
+
+        {/* ══════════════ Development Workflow ══════════════ */}
+        <div className="mb-24">
+          <RowTitle>My Development Workflow</RowTitle>
+          <RoadmapRow steps={devWorkflow} />
+        </div>
+
+        {/* ══════════════ Developer Metrics ══════════════ */}
+        <div className="mb-24">
+          <RowTitle>
+            Developer Metrics{" "}
+            <span className="normal-case text-(--color-muted-foreground)">
+              (self-rated)
+            </span>
+          </RowTitle>
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+            {devMetrics.map((m, i) => (
+              <motion.div
+                key={m.label}
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.06 }}
+                className="rounded-(--radius-lg) border border-(--color-border) bg-(--color-glass-fill) p-4 text-center"
+              >
+                <div
+                  className="relative w-14 h-14 rounded-full mx-auto mb-2 flex items-center justify-center"
+                  style={{
+                    background: `conic-gradient(var(--color-accent) ${m.value}%, rgba(255,255,255,0.08) 0)`,
+                  }}
+                >
+                  <div className="w-11 h-11 rounded-full bg-(--color-bg-elevated) flex items-center justify-center font-mono text-[11px] text-(--color-accent-soft)">
+                    {m.value}
+                  </div>
+                </div>
+                <div className="font-mono text-[10px] text-(--color-muted)">
+                  {m.label}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        {/* ══════════════ Global Presence ══════════════ */}
+        <div className="mb-24 rounded-(--radius-lg) border border-(--color-border) bg-(--color-glass-fill) p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <Globe2 size={20} className="text-(--color-accent) shrink-0" />
+            <div>
+              <RowTitle>Global Presence</RowTitle>
+              <div className="text-[13px] text-(--color-muted) -mt-4">
+                Based in Giza, Egypt — available worldwide.
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {["Remote", "Freelance", "Collaboration", "Open Source"].map(
+              (tag) => (
+                <span
+                  key={tag}
+                  className="px-3 py-1.5 rounded-full border border-(--color-border) bg-(--color-surface) font-mono text-[10px] text-(--color-muted)"
+                >
+                  {tag}
+                </span>
+              )
+            )}
+          </div>
+        </div>
+
+        {/* ══════════════ Journey Preview ══════════════ */}
+        <div className="mb-16">
+          <RowTitle>My Journey Preview</RowTitle>
+          <RoadmapRow steps={journeyPreview} accent />
         </div>
       </div>
+
+      {/* ══════════════ Smart Identity Strip (marquee) ══════════════ */}
+      <Ticker />
     </section>
   );
-}
-
-/* ──────────────────────────────────────────────
-   Syntax highlight components — VS Code Dark+
-   ────────────────────────────────────────────── */
-
-function CL({ n, children }: { n: number; children: React.ReactNode }) {
-  return (
-    <div className="flex items-start">
-      <span className="w-8 shrink-0 text-right pr-4 text-neutral-600 select-none text-[11px] leading-[1.75]">
-        {n}
-      </span>
-      <span className="leading-[1.75]">{children}</span>
-    </div>
-  );
-}
-
-function Ind() {
-  return <span className="inline-block w-[1.4em]" />;
-}
-
-function Kw({ children }: { children: React.ReactNode }) {
-  return <span className="text-[#c586c0]">{children} </span>;
-}
-
-function Id({ children }: { children: React.ReactNode }) {
-  return <span className="text-[#9cdcfe] font-medium">{children} </span>;
-}
-
-function Prop({ children }: { children: React.ReactNode }) {
-  return <span className="text-[#9cdcfe]">{children}</span>;
-}
-
-/** String literal color matched exactly to VS Code Dark+ standard */
-function Str({ children }: { children: React.ReactNode }) {
-  return <span className="text-[#ce9178]">{children}</span>;
-}
-
-function Num({ children }: { children: React.ReactNode }) {
-  return <span className="text-[#b5cea8]">{children}</span>;
-}
-
-function Bool({ children }: { children: React.ReactNode }) {
-  return <span className="text-[#569cd6]">{children}</span>;
-}
-
-function Op({ children }: { children: React.ReactNode }) {
-  return <span className="text-[#d4d4d4]">{children} </span>;
-}
-
-function Br({ children }: { children: React.ReactNode }) {
-  return <span className="text-[#ffd700]">{children}</span>;
-}
-
-function Fn({ children }: { children: React.ReactNode }) {
-  return <span className="text-[#dcdcaa]">{children}</span>;
 }

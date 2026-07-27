@@ -21,7 +21,7 @@ export function SectionHeading({
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-100px" }}
         transition={{ duration: 0.5 }}
-        className="font-mono text-[11px] tracking-[0.25em] uppercase text-neutral-500 mb-6"
+        className="font-mono text-[11px] tracking-[0.25em] uppercase text-(--color-accent) mb-6"
       >
         {index} {"//"} {label}
       </motion.p>
@@ -137,7 +137,7 @@ export function FloatingBadge({
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5, delay: 0.3 }}
-      className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/[0.08] bg-white/[0.02] backdrop-blur-sm ${className}`}
+      className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border border-(--color-border) bg-(--color-glass-fill) backdrop-blur-sm ${className}`}
     >
       {children}
     </motion.div>
@@ -146,7 +146,7 @@ export function FloatingBadge({
 
 export function TechBadge({ label }: { label: string }) {
   return (
-    <span className="inline-flex items-center px-3 py-1 rounded-md text-[10px] font-mono tracking-[0.1em] uppercase border border-white/[0.08] bg-white/[0.02] text-neutral-400 hover:border-white/[0.15] hover:text-neutral-300 transition-all duration-300">
+    <span className="inline-flex items-center px-3 py-1 rounded-md text-[10px] font-mono tracking-[0.1em] uppercase border border-(--color-border) bg-(--color-glass-fill) text-(--color-muted) hover:border-(--color-border-hover) hover:text-(--color-accent) transition-all duration-300">
       {label}
     </span>
   );
@@ -169,10 +169,10 @@ export function MetricCard({
       transition={{ duration: 0.5, delay }}
       className="text-center md:text-left"
     >
-      <div className="text-3xl md:text-4xl font-display font-bold text-white mb-1">
+      <div className="text-3xl md:text-4xl font-display font-bold text-(--color-accent) mb-1">
         {value}
       </div>
-      <div className="font-mono text-[10px] tracking-[0.2em] uppercase text-neutral-500">
+      <div className="font-mono text-[10px] tracking-[0.2em] uppercase text-(--color-muted-foreground)">
         {label}
       </div>
     </motion.div>

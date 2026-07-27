@@ -1,33 +1,29 @@
 import type { Metadata } from "next";
-import {
-  JetBrains_Mono,
-  Playfair_Display,
-  Space_Grotesk,
-  Syne,
-} from "next/font/google";
+import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 
 // next/font/google replaces the previous <link> tags — eliminates the
 // @next/next/no-page-custom-font lint warning and gives us automatic
 // font-display: swap, preloading, and CSS-variable exposure to Tailwind @theme.
+//
+// Approved design system typography: Space Grotesk for display/headings,
+// Inter for body/UI copy, JetBrains Mono for terminal/code/badge text.
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
-  variable: "--font-sans",
+  weight: ["500", "600", "700"],
+  variable: "--font-display",
   display: "swap",
 });
-const syne = Syne({
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-display",
+  weight: ["400", "500", "600"],
+  variable: "--font-sans",
   display: "swap",
 });
 const jetBrainsMono = JetBrains_Mono({
   subsets: ["latin"],
+  weight: ["400", "500"],
   variable: "--font-mono",
-  display: "swap",
-});
-const playfairDisplay = Playfair_Display({
-  subsets: ["latin"],
-  variable: "--font-name",
   display: "swap",
 });
 
@@ -70,7 +66,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${spaceGrotesk.variable} ${syne.variable} ${jetBrainsMono.variable} ${playfairDisplay.variable} scroll-smooth dark`}
+      className={`${spaceGrotesk.variable} ${inter.variable} ${jetBrainsMono.variable} scroll-smooth dark`}
     >
       <head>
         <script
@@ -78,9 +74,9 @@ export default function RootLayout({
             __html: "(function(){try{var t=localStorage.getItem('theme');if(t==='light'){document.documentElement.classList.remove('dark');document.documentElement.classList.add('light');}else{document.documentElement.classList.add('dark');}}catch(e){document.documentElement.classList.add('dark');}})();",
           }}
         />
-        <meta name="theme-color" content="#080808" />
+        <meta name="theme-color" content="#0D1117" />
       </head>
-      <body className="antialiased bg-[#080808] text-white overflow-x-hidden">
+      <body className="antialiased bg-(--color-background) text-(--color-foreground) overflow-x-hidden">
         {children}
       </body>
     </html>
