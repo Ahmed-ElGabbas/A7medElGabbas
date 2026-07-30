@@ -5,12 +5,21 @@ import { Github, Linkedin, Twitter, Facebook } from "lucide-react";
 import { siteConfig, navItems } from "@/lib/data";
 import { GradientDivider } from "@/components/ui/shared";
 
+const builtWith = [
+  "Next.js",
+  "TypeScript",
+  "Tailwind CSS",
+  "Framer Motion",
+  "Lucide Icons",
+  "Vercel",
+];
+
 export default function Footer() {
   return (
-    <footer className="relative border-t border-white/[0.06]">
+    <footer className="relative border-t border-(--color-border)">
       <div className="section-container py-16 md:py-20">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 mb-16">
-          {/* Col 1: Philosophy + Socials */}
+          {/* Col 1: Brand + Socials */}
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -18,22 +27,22 @@ export default function Footer() {
             transition={{ duration: 0.5 }}
           >
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-9 h-9 border border-white/[0.15] rounded-md flex items-center justify-center bg-white/[0.03]">
-                <span className="font-display font-bold text-sm leading-none">
+              <div className="w-9 h-9 border border-(--color-accent) rounded-(--radius-md) flex items-center justify-center bg-(--color-glass-fill)">
+                <span className="font-display font-bold text-sm leading-none text-white">
                   A<br />
-                  <span className="text-neutral-400">E</span>
+                  <span className="text-(--color-accent)">E</span>
                 </span>
               </div>
               <div>
                 <div className="font-display font-semibold text-sm text-white">
-                  Ahmed ElGabbas
+                  {siteConfig.name}
                 </div>
-                <div className="font-mono text-[9px] tracking-[0.15em] uppercase text-neutral-500">
-                  Full-Stack Engineer
+                <div className="font-mono text-[9px] tracking-[0.15em] uppercase text-(--color-muted-foreground)">
+                  Full-Stack &amp; Mobile Engineer
                 </div>
               </div>
             </div>
-            <p className="text-neutral-500 text-sm leading-relaxed mb-6">
+            <p className="text-(--color-muted-foreground) text-sm leading-relaxed mb-6">
               Crafting production-grade systems with precision. Every line of
               code is intentional, every architecture decision deliberate.
             </p>
@@ -50,7 +59,7 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="w-9 h-9 rounded-md border border-white/[0.06] bg-white/[0.02] flex items-center justify-center text-neutral-500 hover:text-white hover:border-white/[0.15] hover:bg-white/[0.04] transition-all duration-300"
+                  className="w-9 h-9 rounded-(--radius-md) border border-(--color-border) bg-(--color-glass-fill) flex items-center justify-center text-(--color-muted-foreground) hover:text-(--color-accent) hover:border-(--color-border-hover) transition-all duration-300"
                 >
                   <Icon size={14} />
                 </a>
@@ -65,7 +74,7 @@ export default function Footer() {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            <h4 className="font-mono text-[10px] tracking-[0.25em] uppercase text-neutral-500 mb-6">
+            <h4 className="font-mono text-[10px] tracking-[0.25em] uppercase text-(--color-accent) mb-6">
               Navigation
             </h4>
             <nav className="flex flex-col gap-3">
@@ -73,7 +82,7 @@ export default function Footer() {
                 <a
                   key={item.href}
                   href={item.href}
-                  className="font-mono text-[11px] tracking-[0.15em] uppercase text-neutral-600 hover:text-white transition-colors duration-300"
+                  className="font-mono text-[11px] tracking-[0.15em] uppercase text-(--color-muted-foreground) hover:text-white transition-colors duration-300"
                 >
                   {item.label}
                 </a>
@@ -88,23 +97,16 @@ export default function Footer() {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <h4 className="font-mono text-[10px] tracking-[0.25em] uppercase text-neutral-500 mb-6">
+            <h4 className="font-mono text-[10px] tracking-[0.25em] uppercase text-(--color-accent) mb-6">
               Built With
             </h4>
             <div className="flex flex-col gap-3">
-              {[
-                "Next.js",
-                "TypeScript",
-                "Tailwind CSS",
-                "Framer Motion",
-                "Lucide Icons",
-                "Vercel",
-              ].map((tech) => (
+              {builtWith.map((tech) => (
                 <div
                   key={tech}
-                  className="flex items-center gap-2 font-mono text-[11px] tracking-[0.1em] text-neutral-600"
+                  className="flex items-center gap-2 font-mono text-[11px] tracking-[0.1em] text-(--color-muted-foreground)"
                 >
-                  <span className="w-1 h-1 rounded-full bg-neutral-700" />
+                  <span className="w-1 h-1 rounded-full bg-(--color-accent)" />
                   {tech}
                 </div>
               ))}
@@ -122,11 +124,11 @@ export default function Footer() {
           transition={{ duration: 0.5, delay: 0.3 }}
           className="flex flex-col md:flex-row items-center justify-between gap-4 pt-8"
         >
-          <span className="font-mono text-[9px] tracking-[0.2em] uppercase text-neutral-700">
-            © 2026 Ahmed ElGabbas. All rights reserved.
+          <span className="font-mono text-[9px] tracking-[0.2em] uppercase text-(--color-muted-foreground)">
+            © 2026 {siteConfig.name}. All rights reserved.
           </span>
-          <span className="font-mono text-[9px] tracking-[0.2em] uppercase text-neutral-700">
-            Engineered with precision & intent
+          <span className="font-mono text-[9px] tracking-[0.2em] uppercase text-(--color-muted-foreground)">
+            Engineered with precision &amp; intent
           </span>
         </motion.div>
       </div>

@@ -128,76 +128,102 @@ export default function Header() {
         })}
       </div>
 
-      <motion.header
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        className="fixed top-0 left-0 right-0 z-50 flex justify-center px-4 md:px-12"
-      >
-        <div
-          className={`w-full flex items-center justify-between transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${isScrolled
-            ? "max-w-[1100px] px-8 h-[76px] rounded-full bg-(--color-glass-fill-strong) backdrop-blur-xl border border-(--color-border-hover) shadow-(--shadow-2)"
-            : "max-w-[1200px] px-10 h-[76px] rounded-full bg-transparent border border-transparent"
-            }`}
-        >
-          {/* Logo + Wordmark */}
-          <a
-            href="#home"
-            onClick={(e) => {
-              e.preventDefault();
-              scrollToSection("#home");
+      <header className="fixed top-0 left-0 right-0 z-50 flex justify-center px-4 md:px-12">
+        <div className="w-full max-w-[1200px] mx-auto flex items-center justify-between gap-4 py-3">
+          <motion.div
+            initial={{
+              opacity: 0.98,
+              y: 0,
+              backdropFilter: "blur(0px)",
+              backgroundColor: "rgba(255,255,255,0)",
+              borderColor: "transparent",
+              boxShadow: "none",
+              paddingLeft: 20,
+              paddingRight: 20,
+              scale: 1,
             }}
-            className="flex items-center gap-5 group"
+            animate={isScrolled ? {
+              opacity: 1,
+              y: -2,
+              backdropFilter: "blur(20px)",
+              backgroundColor: "rgba(255,255,255,0.08)",
+              borderColor: "rgba(212,175,55,0.18)",
+              boxShadow: "0 24px 60px rgba(0,0,0,0.12)",
+              paddingLeft: 10,
+              paddingRight: 20,
+              scale: 1.003,
+            } : {
+              opacity: 0.98,
+              y: 0,
+              backdropFilter: "blur(0px)",
+              backgroundColor: "rgba(255,255,255,0)",
+              borderColor: "transparent",
+              boxShadow: "none",
+              paddingLeft: 20,
+              paddingRight: 20,
+              scale: 1,
+            }}
+            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+            className="flex items-center gap-4 rounded-full border border-transparent h-[68px]"
           >
-            <div className="w-15 h-15 rounded-md flex items-center justify-center bg-(--color-glass-fill) border border-(--color-border) group-hover:border-(--color-border-hover) transition-all duration-300 overflow-hidden">
-              <Image
-                src={logoImage.src}
-                alt="Ahmed ElGabbas logo"
-                width={46}
-                height={46}
-                className="w-full h-full object-contain"
-                style={{ objectFit: "contain" }}
-              />
-            </div>
-            <span className="font-display font-bold text-[20px] md:text-[34px] leading-none text-white">
-              Ahmed<span className="text-(--color-accent)">ElGabbas</span>
-            </span>
-          </a>
+            {/* Logo + Wordmark */}
+            <a
+              href="#home"
+              onClick={(e) => {
+                e.preventDefault();
+                scrollToSection("#home");
+              }}
+              className="flex items-center gap-4 group"
+            >
+              <div className="w-14 h-14 rounded-full flex items-center justify-center bg-(--color-glass-fill) border border-(--color-border) group-hover:border-(--color-border-hover) transition-all duration-300 overflow-hidden">
+                <Image
+                  src={logoImage.src}
+                  alt="Ahmed ElGabbas logo"
+                  width={46}
+                  height={46}
+                  className="w-full h-full object-contain"
+                  style={{ objectFit: "contain" }}
+                />
+              </div>
+              <span className="font-display font-bold text-[20px] md:text-[34px] leading-none text-white">
+                Ahmed<span className="text-(--color-accent)">ElGabbas</span>
+              </span>
+            </a>
 
-          {/* Desktop Nav */}
-          <nav className="hidden lg:flex items-center gap-1">
-            {navItems.map((item) => {
-              const isActive = activeId === item.href.replace("#", "");
-              return (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    scrollToSection(item.href);
-                  }}
-                  className={`relative px-6 py-2.5 rounded-full font-sans text-[17px] transition-colors duration-200 ${isActive
-                    ? "text-(--color-accent)"
-                    : "text-(--color-muted) hover:text-white"
-                    }`}
-                  style={{ marginLeft: 6, marginRight: 6 }}
-                >
-                  {isActive && (
-                    <motion.div
-                      layoutId="nav-active-pill"
-                      className="absolute inset-0 rounded-full"
-                      style={{
-                        background: "rgba(212,175,55,0.08)",
-                        border: "1px solid rgba(212,175,55,0.25)",
-                      }}
-                      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                    />
-                  )}
-                  <span className="relative z-10">{item.label}</span>
-                </a>
-              );
-            })}
-          </nav>
+            {/* Desktop Nav */}
+            <nav className="hidden lg:flex items-center gap-2">
+              {navItems.map((item) => {
+                const isActive = activeId === item.href.replace("#", "");
+                return (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      scrollToSection(item.href);
+                    }}
+                    className={`relative px-4 py-2 rounded-full font-sans text-[17px] transition-colors duration-200 ${isActive
+                      ? "text-(--color-accent)"
+                      : "text-(--color-muted) hover:text-white"
+                      }`}
+                  >
+                    {isActive && (
+                      <motion.div
+                        layoutId="nav-active-pill"
+                        className="absolute inset-0 rounded-full"
+                        style={{
+                          background: "rgba(212,175,55,0.08)",
+                          border: "1px solid rgba(212,175,55,0.25)",
+                        }}
+                        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                      />
+                    )}
+                    <span className="relative z-10">{item.label}</span>
+                  </a>
+                );
+              })}
+            </nav>
+          </motion.div>
 
           {/* Theme toggle + Resume + Mobile toggle */}
           <div className="flex items-center gap-4">
@@ -262,7 +288,7 @@ export default function Header() {
             </button>
           </div>
         </div >
-      </motion.header >
+      </header >
 
       {/* Mobile — fullscreen glass overlay menu */}
       <AnimatePresence>

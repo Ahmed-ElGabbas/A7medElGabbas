@@ -158,7 +158,7 @@ const achievementBadges = [
 const orbitChips = ["React", "Next.js", "Flutter", "Node.js"] as const;
 
 /** Spine label letters — split so we can stagger-animate them. */
-const spineLetters = ["A", "H", "M", "E", "D"];
+const spineLetters = ["A", "H", "M", "E", "D","E","L","G","B","B","A","S"];
 
 /* ----------------------------------------------------------------------- */
 /* Background — base fill, grid overlay, gold ambient glow                 */
@@ -556,7 +556,7 @@ function LiveTerminalCard() {
       initial={{ opacity: 0, y: 30, scale: 0.96 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.6, delay: 0.75, ease: easeOutExpo }}
-      className="absolute -bottom-6 -left-6 lg:-left-10 z-20 w-[300px] md:w-[330px] lg:w-[350px] rounded-[14px] border border-(--color-border-hover) shadow-(--shadow-2) overflow-hidden"
+      className="absolute -bottom-45 right-45 lg:-right-10 z-20 w-[350px] md:w-[350px] rounded-xl border border-white/[0.05] shadow-[0_0_40px_rgba(0,0,0,0.2)]"
       style={{
         background: "rgba(20, 22, 24, 0.88)",
         backdropFilter: "blur(18px)",

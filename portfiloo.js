@@ -29,7 +29,7 @@ blurOverlay.addEventListener('click', () => {
 // Close mobile menu when clicking on a link
 const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
 mobileNavLinks.forEach(link => {
-    link.addEventListener('click', (e) => {
+    link.addEventListener('click', () => {
         // Update active state
         mobileNavLinks.forEach(l => l.classList.remove('active'));
         link.classList.add('active');
@@ -94,8 +94,7 @@ window.addEventListener('scroll', () => {
     let current = '';
     sections.forEach(section => {
         const sectionTop = section.offsetTop;
-        const sectionHeight = section.clientHeight;
-        if (scrollY >= (sectionTop - 200)) {
+        if (window.scrollY >= (sectionTop - 200)) {
             current = section.getAttribute('id');
         }
     });
