@@ -161,19 +161,16 @@ const orbitChips = ["React", "Next.js", "Flutter", "Node.js"] as const;
 const spineLetters = ["A", "H", "M", "E", "D","E","L","G","B","B","A","S"];
 
 /* ----------------------------------------------------------------------- */
-/* Background — base fill, grid overlay, gold ambient glow                 */
+/* Background — gold ambient glows (the shared grid overlay backdrop is    */
+/* rendered once, globally, in layout.tsx)                                  */
 /* ----------------------------------------------------------------------- */
 
 function Background() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {/* Layer 1 — base fill */}
-      <div className="absolute inset-0 bg-(--color-background)" />
-
-      {/* Layer 2 — shared grid overlay, low opacity */}
-      <div className="grid-overlay" style={{ position: "absolute" }} />
-
-      {/* Layer 3 — ambient gold glow, centered behind the portrait column */}
+      {/* Layer 1 — ambient gold glow, centered behind the portrait column.
+          The shared .grid-overlay grid backdrop is now rendered globally in
+          layout.tsx behind every section, including this one. */}
       <div
         className="absolute inset-0"
         style={{
@@ -191,7 +188,7 @@ function Background() {
         }}
       />
 
-      {/* Layer 4 — frame edge-glow. Tighter, brighter gold blob hugging the
+      {/* Layer 2 — frame edge-glow. Tighter, brighter gold blob hugging the
           portrait frame, mimicking a light source behind-right. */}
       <div
         className="absolute"
@@ -671,7 +668,7 @@ function PortraitPlaceholder() {
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse at 50% 30%, #1a1a1a 0%, #101010 55%, #0d1117 100%)",
+            "radial-gradient(ellipse at 50% 30%, #1a1a1a 0%, #101010 55%, #000000 100%)",
         }}
       />
       {/* Soft rim-light cue (matches external frame edge-glow direction) */}
@@ -786,7 +783,7 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="relative w-full overflow-hidden bg-(--color-background)"
+      className="relative w-full overflow-hidden"
       style={{ minHeight: "100vh" }}
     >
       {/* Background layers */}

@@ -1,29 +1,26 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
-// next/font/google replaces the previous <link> tags — eliminates the
+// next/font replaces the previous <link> tags — eliminates the
 // @next/next/no-page-custom-font lint warning and gives us automatic
-// font-display: swap, preloading, and CSS-variable exposure to Tailwind @theme.
+// font-display: swap, preloading, and CSS-variable exposure to Tailwind.
 //
-// Approved design system typography: Space Grotesk for display/headings,
-// Inter for body/UI copy, JetBrains Mono for terminal/code/badge text.
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  weight: ["500", "600", "700"],
-  variable: "--font-display",
-  display: "swap",
-});
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
+// Updated design system typography: Cascadia Code (weight 600) everywhere —
+// headings, body/UI copy, and terminal/code/badge text all use the same
+// family. A single instance is wired to --font-sans; globals.css aliases
+// --font-display and --font-mono to it, so the whole site resolves to this
+// one loaded font.
+//
+// Self-hosted via next/font/local because next/font/google fails to load
+// "Cascadia Code" with "Failed to find font override values for font
+// 'Cascadia Code'" (Next.js lacks font-metrics data for it yet). The woff2
+// below was pulled from Google Fonts' own CSS endpoint.
+const cascadiaCode = localFont({
+  src: "./fonts/CascadiaCode-600.woff2",
+  weight: "600",
+  style: "normal",
   variable: "--font-sans",
-  display: "swap",
-});
-const jetBrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-mono",
   display: "swap",
 });
 
@@ -66,7 +63,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${spaceGrotesk.variable} ${inter.variable} ${jetBrainsMono.variable} scroll-smooth dark`}
+      className={`${cascadiaCode.variable} scroll-smooth dark`}
     >
       <head>
         <script
@@ -77,6 +74,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#0D1117" />
       </head>
       <body className="antialiased bg-(--color-background) text-(--color-foreground) overflow-x-hidden">
+        <div className="grid-overlay" aria-hidden="true" />
         {children}
       </body>
     </html>

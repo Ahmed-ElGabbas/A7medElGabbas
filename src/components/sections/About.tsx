@@ -328,7 +328,7 @@ export default function About() {
                   className="absolute inset-0"
                   style={{
                     background:
-                      "radial-gradient(ellipse at 50% 30%, #1a1a1a 0%, #101010 55%, #0d1117 100%)",
+                      "radial-gradient(ellipse at 50% 30%, #1a1a1a 0%, #101010 55%, #000000 100%)",
                   }}
                 />
                 <div className="absolute inset-0 flex items-center justify-center">

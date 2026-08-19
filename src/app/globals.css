@@ -1,13 +1,18 @@
 @import "tailwindcss";
 
 :root {
-  /* === Font families (approved design system) === */
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  /* === Font families — Cascadia Code everywhere (updated design system) ===
+     --font-sans resolves to the self-hosted Cascadia Code family loaded by
+     next/font/local in layout.tsx (its @font-face family is "cascadiaCode",
+     plus a generated size-adjusted "cascadiaCode Fallback"); --font-display
+     and --font-mono alias it so headings, body/UI, and code/badge text all
+     resolve to the same family, with monospace as the final fallback. */
+  --font-sans: "cascadiaCode", "cascadiaCode Fallback", monospace;
+  --font-display: var(--font-sans);
+  --font-mono: var(--font-sans);
 
   /* === Backgrounds === */
-  --color-background: #0d1117;
+  --color-background: #000000;
   --color-background-alt: #161b22;
   --color-bg-elevated: #1e1e1e;
 
@@ -69,7 +74,7 @@
   @supports (scrollbar-width: thin) {
     html {
       scrollbar-width: thin;
-      scrollbar-color: #3a3a3a #0d1117;
+      scrollbar-color: #3a3a3a #000000;
     }
   }
 
@@ -103,7 +108,7 @@
   }
 
   ::-webkit-scrollbar-track {
-    background: #0d1117;
+    background: #000000;
   }
 
   ::-webkit-scrollbar-thumb {
@@ -269,7 +274,10 @@
     background-size: 24px 24px;
   }
 
-  /* Shared grid-overlay backdrop used across every section per the approved design */
+  /* Global grid-overlay backdrop — rendered once in layout.tsx, fixed behind
+     every section per the approved design. A slow, seamless drift plus a soft
+     gold glow sweep (matching --color-accent) keep it subtly alive. z-index 0
+     and pointer-events: none keep it strictly behind all real content. */
   .grid-overlay {
     position: fixed;
     inset: 0;
@@ -278,6 +286,23 @@
     background-size: 64px 64px;
     pointer-events: none;
     z-index: 0;
+    animation: grid-drift 24s ease-in-out infinite;
+  }
+
+  /* Soft gold glow that slowly sweeps across the grid — oversized so the
+     wander never exposes an edge; transform-based for GPU compositing. */
+  .grid-overlay::before {
+    content: "";
+    position: absolute;
+    inset: -40%;
+    background: radial-gradient(
+      ellipse 55vmax 55vmax at center,
+      rgba(212, 175, 55, 0.08) 0%,
+      rgba(212, 175, 55, 0.03) 45%,
+      transparent 70%
+    );
+    animation: grid-glow-sweep 22s ease-in-out infinite;
+    will-change: transform;
   }
 
   .noise-bg {
@@ -428,5 +453,49 @@
 
   90% {
     transform: translate(-10%, 10%);
+  }
+}
+
+/* Slow seamless drift for the global grid — travels exactly one 64px cell
+   per loop and eases back, so the pattern shimmers without ever jumping. */
+@keyframes grid-drift {
+
+  0%,
+  100% {
+    background-position: 0 0;
+  }
+
+  50% {
+    background-position: 64px 64px;
+  }
+}
+
+/* Gentle wander for the sweeping gold glow across the grid. */
+@keyframes grid-glow-sweep {
+
+  0%,
+  100% {
+    transform: translate3d(-12%, -8%, 0);
+  }
+
+  25% {
+    transform: translate3d(14%, 6%, 0);
+  }
+
+  50% {
+    transform: translate3d(-8%, 14%, 0);
+  }
+
+  75% {
+    transform: translate3d(10%, -10%, 0);
+  }
+}
+
+/* Respect prefers-reduced-motion: freeze the grid's ambient animations,
+   leaving the static pattern in place. */
+@media (prefers-reduced-motion: reduce) {
+  .grid-overlay,
+  .grid-overlay::before {
+    animation: none;
   }
 }
