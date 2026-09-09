@@ -1,66 +1,150 @@
 @import "tailwindcss";
 
-:root {
-  /* === Font families — Cascadia Code everywhere (updated design system) ===
-     --font-sans resolves to the self-hosted Cascadia Code family loaded by
-     next/font/local in layout.tsx (its @font-face family is "cascadiaCode",
-     plus a generated size-adjusted "cascadiaCode Fallback"); --font-display
-     and --font-mono alias it so headings, body/UI, and code/badge text all
-     resolve to the same family, with monospace as the final fallback. */
-  --font-sans: "cascadiaCode", "cascadiaCode Fallback", monospace;
+/* ============================================================================
+   Design System — Ahmed ElGabbas Portfolio
+   Gold + Dark/Light dual-mode theme
+   ============================================================================ */
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Typography */
+  --font-sans: "cascadiaCode", "cascadiaCode Fallback", ui-monospace, monospace;
   --font-display: var(--font-sans);
   --font-mono: var(--font-sans);
 
-  /* === Backgrounds === */
-  --color-background: #000000;
-  --color-background-alt: #161b22;
-  --color-bg-elevated: #1e1e1e;
+  /* Radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
 
-  /* === Surfaces === */
-  --color-surface: #252526;
-  --color-surface-hover: #2d2d30;
-  --color-card: #252526;
-  --color-card-hover: #2d2d30;
-
-  /* === Text === */
-  --color-foreground: #ffffff;
-  --color-muted: #c9d1d9;
-  --color-muted-foreground: #8b949e;
-
-  /* === Borders / glass === */
-  --color-border: rgba(255, 255, 255, 0.08);
-  --color-border-hover: rgba(255, 255, 255, 0.16);
-  --color-glass-fill: rgba(255, 255, 255, 0.06);
-  --color-glass-fill-strong: rgba(255, 255, 255, 0.08);
-
-  /* === Gold accent system — accent only, never a background fill === */
-  --color-accent: #d4af37;
-  --color-accent-soft: #f5d76e;
-  --color-accent-hover: #ffd54f;
-
-  /* === Radius scale (signature radius = 24px) === */
-  --radius-sm: 10px;
-  --radius-md: 16px;
-  --radius-lg: 24px;
-  --radius-xl: 32px;
-  --radius-full: 999px;
-
-  /* === Shadows === */
-  --shadow-1: 0 4px 16px rgba(0, 0, 0, 0.35);
-  --shadow-2: 0 12px 32px rgba(0, 0, 0, 0.5);
-  --shadow-3: 0 24px 64px rgba(0, 0, 0, 0.6);
-
-  /* === Animation tokens === */
-  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
-  --duration-fast: 150ms;
-  --duration-base: 220ms;
-  --duration-slow: 500ms;
-  --duration-ambient: 5.5s;
+  /* Animations */
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-float-soft: float-soft 5.5s ease-in-out infinite;
+  --animate-pulse-slow: pulse-slow 4s ease-in-out infinite;
+  --animate-scroll-dot: scroll-dot 1.5s ease-in-out infinite;
+  --animate-badge-pulse: badge-pulse 2s ease-in-out infinite;
 }
 
+/* ============================================================================
+   Color Variables — Light mode (default)
+   ============================================================================ */
+:root {
+  --background: hsl(0 0% 98%);
+  --foreground: hsl(0 0% 10%);
+
+  --card: hsl(0 0% 100%);
+  --card-foreground: hsl(0 0% 10%);
+
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(0 0% 10%);
+
+  --primary: hsl(43 72% 38%);
+  --primary-foreground: hsl(0 0% 100%);
+
+  --secondary: hsl(40 10% 93%);
+  --secondary-foreground: hsl(0 0% 15%);
+
+  --muted: hsl(40 8% 93%);
+  --muted-foreground: hsl(0 0% 42%);
+
+  --accent: hsl(43 72% 38%);
+  --accent-foreground: hsl(0 0% 100%);
+
+  --destructive: hsl(0 84% 60%);
+  --destructive-foreground: hsl(0 0% 100%);
+
+  --border: hsl(0 0% 88%);
+  --input: hsl(0 0% 88%);
+  --ring: hsl(43 72% 38%);
+
+  /* Custom extended tokens */
+  --color-accent-gold: #b8960c;
+  --color-accent-gold-soft: #d4af37;
+  --color-accent-gold-hover: #c9a30e;
+  --color-glass-fill: rgba(0, 0, 0, 0.03);
+  --color-glass-fill-strong: rgba(0, 0, 0, 0.06);
+  --color-border-hover: rgba(0, 0, 0, 0.15);
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.1);
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ============================================================================
+   Color Variables — Dark mode
+   ============================================================================ */
+.dark {
+  --background: hsl(0 0% 2%);
+  --foreground: hsl(0 0% 100%);
+
+  --card: hsl(220 13% 7%);
+  --card-foreground: hsl(0 0% 100%);
+
+  --popover: hsl(220 13% 7%);
+  --popover-foreground: hsl(0 0% 100%);
+
+  --primary: hsl(43 72% 52%);
+  --primary-foreground: hsl(0 0% 0%);
+
+  --secondary: hsl(220 13% 12%);
+  --secondary-foreground: hsl(0 0% 85%);
+
+  --muted: hsl(220 10% 16%);
+  --muted-foreground: hsl(215 12% 62%);
+
+  --accent: hsl(43 72% 52%);
+  --accent-foreground: hsl(0 0% 0%);
+
+  --destructive: hsl(0 84% 60%);
+  --destructive-foreground: hsl(0 0% 100%);
+
+  --border: rgba(255, 255, 255, 0.08);
+  --input: rgba(255, 255, 255, 0.08);
+  --ring: hsl(43 72% 52%);
+
+  /* Custom extended tokens */
+  --color-accent-gold: #d4af37;
+  --color-accent-gold-soft: #f5d76e;
+  --color-accent-gold-hover: #ffd54f;
+  --color-glass-fill: rgba(255, 255, 255, 0.04);
+  --color-glass-fill-strong: rgba(255, 255, 255, 0.08);
+  --color-border-hover: rgba(255, 255, 255, 0.16);
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* ============================================================================
+   Base Styles
+   ============================================================================ */
 @layer base {
   * {
+    @apply border-border;
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -70,165 +154,64 @@
     scroll-behavior: smooth;
   }
 
-  /* Firefox-only scrollbar properties: apply via feature query to avoid editor warnings */
-  @supports (scrollbar-width: thin) {
-    html {
-      scrollbar-width: thin;
-      scrollbar-color: #3a3a3a #000000;
-    }
-  }
-
   body {
+    @apply bg-background text-foreground antialiased;
     font-family: var(--font-sans);
-    background-color: var(--color-background);
-    color: var(--color-foreground);
     line-height: 1.6;
     overflow-x: hidden;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  /* Apply momentum scrolling only where supported (iOS Safari / WebKit) */
-  @supports (-webkit-overflow-scrolling: touch) {
-
-    html,
-    body {
-      -webkit-overflow-scrolling: touch;
-    }
   }
 
   ::selection {
-    background-color: rgba(255, 255, 255, 0.15);
-    color: #fff;
+    @apply bg-primary/20 text-foreground;
   }
 
-  /* WebKit scrollbar for Chromium browsers — matches Firefox appearance above */
+  /* Scrollbar */
   ::-webkit-scrollbar {
     width: 6px;
   }
 
   ::-webkit-scrollbar-track {
-    background: #000000;
+    @apply bg-background;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #3a3a3a;
     border-radius: 3px;
+    @apply bg-muted-foreground/30;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: var(--color-accent);
+    background: var(--color-accent-gold);
   }
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
+  @supports (scrollbar-width: thin) {
+    html {
+      scrollbar-width: thin;
+    }
+  }
+
+  h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
   }
 }
 
+/* ============================================================================
+   Component Utilities
+   ============================================================================ */
 @layer components {
   .section-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 24px;
-  }
-
-  /* Wider container for the Hero (per Section 2 of the spec) */
-  .section-container-hero {
-    max-width: 1440px;
-    margin: 0 auto;
-    padding: 0 24px;
-  }
-
-  @media (min-width: 768px) {
-
-    .section-container,
-    .section-container-hero {
-      padding: 0 48px;
-    }
-  }
-
-  @media (min-width: 1280px) {
-
-    .section-container,
-    .section-container-hero {
-      padding: 0 64px;
-    }
+    @apply max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 xl:px-16;
   }
 
   .section-padding {
-    padding-top: 120px;
-    padding-bottom: 120px;
+    @apply py-20 md:py-28 lg:py-32;
   }
 
-  @media (max-width: 768px) {
-    .section-padding {
-      padding-top: 80px;
-      padding-bottom: 80px;
-    }
-  }
-
-  .gradient-text {
-    background: linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .gradient-line {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
-  }
-
-  /* === Glass tiers (sm / md / lg) === */
-  .glass-sm {
-    background: var(--color-glass-fill);
-    border: 1px solid var(--color-border);
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
-    border-radius: var(--radius-full);
-  }
-
-  .glass-md {
-    background: var(--color-glass-fill);
-    border: 1px solid var(--color-border);
-    -webkit-backdrop-filter: blur(14px);
-    backdrop-filter: blur(14px);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-1);
-  }
-
-  .glass-lg {
-    background: var(--color-glass-fill-strong);
-    border: 1px solid var(--color-border-hover);
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-2);
-    position: relative;
-  }
-
-  .glass-lg::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 20px;
-    right: 20px;
-    height: 1px;
-    background: rgba(255, 255, 255, 0.1);
-  }
-
-  /* Backwards-compatible alias for existing markup */
   .glass-card {
     background: var(--color-glass-fill);
-    border: 1px solid var(--color-border);
-    -webkit-backdrop-filter: blur(14px);
-    backdrop-filter: blur(14px);
-    border-radius: var(--radius-lg);
+    border: 1px solid hsl(var(--border));
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    @apply rounded-xl transition-all duration-300;
   }
 
   .glass-card:hover {
@@ -236,263 +219,93 @@
     border-color: var(--color-border-hover);
   }
 
-  /* === Gold-accent glow utilities === */
-  .shadow-glow-gold {
-    box-shadow: 0 0 32px rgba(212, 175, 55, 0.35);
+  .gradient-text {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, hsl(var(--foreground)) 0%, hsl(var(--muted-foreground)) 100%);
   }
 
-  .shadow-glow-gold-soft {
-    box-shadow: 0 0 20px rgba(212, 175, 55, 0.18);
+  .gold-text {
+    color: var(--color-accent-gold);
   }
 
-  .shadow-drop-soft {
-    box-shadow: var(--shadow-2);
+  .gold-glow {
+    box-shadow: 0 0 32px rgba(212, 175, 55, 0.25);
   }
 
-  .shadow-card-soft {
-    box-shadow: var(--shadow-1);
+  .gold-glow-sm {
+    box-shadow: 0 0 16px rgba(212, 175, 55, 0.15);
   }
 
-  .shadow-btn-gold {
-    box-shadow: 0 8px 24px rgba(212, 175, 55, 0.25);
-  }
-
-  .shadow-btn-gold-hover {
-    box-shadow: 0 12px 32px rgba(212, 175, 55, 0.35);
-  }
-
-  .glow-sm {
-    box-shadow: 0 0 20px rgba(212, 175, 55, 0.08);
-  }
-
-  .glow-md {
-    box-shadow: 0 0 40px rgba(212, 175, 55, 0.12);
-  }
-
-  .dot-pattern {
-    background-image: radial-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px);
-    background-size: 24px 24px;
-  }
-
-  /* Global grid-overlay backdrop — rendered once in layout.tsx, fixed behind
-     every section per the approved design. A slow, seamless drift plus a soft
-     gold glow sweep (matching --color-accent) keep it subtly alive. z-index 0
-     and pointer-events: none keep it strictly behind all real content. */
+  /* Grid background overlay */
   .grid-overlay {
     position: fixed;
     inset: 0;
-    background-image: linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+    background-image:
+      linear-gradient(hsl(var(--foreground) / 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--foreground) / 0.02) 1px, transparent 1px);
     background-size: 64px 64px;
     pointer-events: none;
     z-index: 0;
     animation: grid-drift 24s ease-in-out infinite;
   }
 
-  /* Soft gold glow that slowly sweeps across the grid — oversized so the
-     wander never exposes an edge; transform-based for GPU compositing. */
   .grid-overlay::before {
     content: "";
     position: absolute;
     inset: -40%;
     background: radial-gradient(
       ellipse 55vmax 55vmax at center,
-      rgba(212, 175, 55, 0.08) 0%,
-      rgba(212, 175, 55, 0.03) 45%,
+      rgba(212, 175, 55, 0.06) 0%,
+      rgba(212, 175, 55, 0.02) 45%,
       transparent 70%
     );
     animation: grid-glow-sweep 22s ease-in-out infinite;
     will-change: transform;
   }
-
-  .noise-bg {
-    position: relative;
-  }
-
-  .noise-bg::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-    opacity: 0.4;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .text-stroke {
-    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.2);
-    -webkit-text-fill-color: transparent;
-  }
-
-  /* === Animations (Section 13) === */
-  .animate-float {
-    animation: float 6s ease-in-out infinite;
-  }
-
-  .animate-float-soft {
-    animation: float-soft 5.5s ease-in-out infinite;
-  }
-
-  .animate-pulse-slow {
-    animation: pulse-slow 4s ease-in-out infinite;
-  }
-
-  .animate-badge-pulse {
-    animation: badge-pulse 2s ease-in-out infinite;
-  }
-
-  .animate-scroll-dot {
-    animation: scroll-dot 1.5s ease-in-out infinite;
-  }
 }
 
+/* ============================================================================
+   Keyframe Animations
+   ============================================================================ */
 @keyframes float {
-
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-
-  50% {
-    transform: translateY(-10px);
-  }
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
 }
 
 @keyframes float-soft {
-
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-
-  50% {
-    transform: translateY(-6px);
-  }
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
 }
 
 @keyframes pulse-slow {
-
-  0%,
-  100% {
-    opacity: 0.4;
-  }
-
-  50% {
-    opacity: 0.8;
-  }
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
 }
 
 @keyframes badge-pulse {
-
-  0%,
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  50% {
-    opacity: 0.55;
-    transform: scale(1.18);
-  }
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.55; transform: scale(1.18); }
 }
 
 @keyframes scroll-dot {
-  0% {
-    transform: translateY(-6px);
-    opacity: 0;
-  }
-
-  40% {
-    opacity: 1;
-  }
-
-  100% {
-    transform: translateY(6px);
-    opacity: 0;
-  }
+  0% { transform: translateY(-6px); opacity: 0; }
+  40% { opacity: 1; }
+  100% { transform: translateY(6px); opacity: 0; }
 }
 
-@keyframes grain {
-
-  0%,
-  100% {
-    transform: translate(0, 0);
-  }
-
-  10% {
-    transform: translate(-5%, -10%);
-  }
-
-  20% {
-    transform: translate(-15%, 5%);
-  }
-
-  30% {
-    transform: translate(7%, -25%);
-  }
-
-  40% {
-    transform: translate(-5%, 25%);
-  }
-
-  50% {
-    transform: translate(-15%, 10%);
-  }
-
-  60% {
-    transform: translate(15%, 0%);
-  }
-
-  70% {
-    transform: translate(0%, 15%);
-  }
-
-  80% {
-    transform: translate(3%, 35%);
-  }
-
-  90% {
-    transform: translate(-10%, 10%);
-  }
-}
-
-/* Slow seamless drift for the global grid — travels exactly one 64px cell
-   per loop and eases back, so the pattern shimmers without ever jumping. */
 @keyframes grid-drift {
-
-  0%,
-  100% {
-    background-position: 0 0;
-  }
-
-  50% {
-    background-position: 64px 64px;
-  }
+  0%, 100% { background-position: 0 0; }
+  50% { background-position: 64px 64px; }
 }
 
-/* Gentle wander for the sweeping gold glow across the grid. */
 @keyframes grid-glow-sweep {
-
-  0%,
-  100% {
-    transform: translate3d(-12%, -8%, 0);
-  }
-
-  25% {
-    transform: translate3d(14%, 6%, 0);
-  }
-
-  50% {
-    transform: translate3d(-8%, 14%, 0);
-  }
-
-  75% {
-    transform: translate3d(10%, -10%, 0);
-  }
+  0%, 100% { transform: translate3d(-12%, -8%, 0); }
+  25% { transform: translate3d(14%, 6%, 0); }
+  50% { transform: translate3d(-8%, 14%, 0); }
+  75% { transform: translate3d(10%, -10%, 0); }
 }
 
-/* Respect prefers-reduced-motion: freeze the grid's ambient animations,
-   leaving the static pattern in place. */
+/* Respect prefers-reduced-motion */
 @media (prefers-reduced-motion: reduce) {
   .grid-overlay,
   .grid-overlay::before {

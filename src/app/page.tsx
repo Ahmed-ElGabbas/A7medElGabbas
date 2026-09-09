@@ -1,18 +1,18 @@
-import Header from "@/components/sections/Header";
-import Hero from "@/components/sections/Hero";
-import About from "@/components/sections/About";
-import Skills from "@/components/sections/Skills";
-import Experience from "@/components/sections/Experience";
-import Projects from "@/components/sections/Projects";
-import Recognitions from "@/components/sections/Recognitions";
-import Contact from "@/components/sections/Contact";
-import Footer from "@/components/sections/Footer";
+import Header from "@/components/sections/header";
+import Hero from "@/components/sections/hero";
+import About from "@/components/sections/about";
+import Skills from "@/components/sections/skills";
+import Experience from "@/components/sections/experience";
+import Projects from "@/components/sections/projects";
+import Recognitions from "@/components/sections/recognitions";
+import Contact from "@/components/sections/contact";
+import Footer from "@/components/sections/footer";
 
 export default function Home() {
   return (
     <>
       <Header />
-      <main>
+      <main className="min-h-screen">
         <Hero />
         <About />
         <Skills />
