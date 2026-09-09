@@ -35,7 +35,7 @@ Whenever you need to update any information in the future, simply open and edit 
 - **Skills & Stack**: Skill categories, tags, architecture spotlights, scrolling ticker.
 - **Experience & Education**: Timeline positions, degree, courses, future goals.
 - **Projects**: Titles, descriptions, categories, tech tags, GitHub links.
-- **Recognitions**: ICPC & community honors, metrics plaque, affiliations.
+- **Certificates**: Verified credentials, specialized engineering tracks, metrics plaque, accredited issuers.
 
 ---
 
@@ -74,7 +74,7 @@ my-wedsite/
 │   │   │   ├── skills.tsx       # Tabbed tech stack & architecture spotlight
 │   │   │   ├── experience.tsx   # Chronological career & academic timeline
 │   │   │   ├── projects.tsx     # Filterable project showcase cards
-│   │   │   ├── recognitions.tsx # ICPC honors & competitive programming
+│   │   │   ├── certificates.tsx # Verified credentials & specialized engineering tracks
 │   │   │   ├── contact.tsx      # Direct communication cards & contact form
 │   │   │   └── footer.tsx       # Quick navigation & copyright
 │   │   └── ui/            # shadcn/ui and custom primitives

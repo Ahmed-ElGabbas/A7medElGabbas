@@ -68,7 +68,7 @@ export const navItems = [
   { label: "Skills", href: "#skills" },
   { label: "Experience", href: "#experience" },
   { label: "Projects", href: "#projects" },
-  { label: "Recognitions", href: "#recognitions" },
+  { label: "Certificates", href: "#certificates" },
   { label: "Contact", href: "#contact" },
 ];
 
@@ -382,45 +382,134 @@ export const projects = [
 ];
 
 /* -------------------------------------------------------------------------- */
-/* 9. RECOGNITIONS & ACHIEVEMENTS                                             */
+/* 9. LICENSES & CERTIFICATIONS                                               */
 /* -------------------------------------------------------------------------- */
-export const recognitions = [
+export interface Certificate {
+  id: string;
+  title: string;
+  issuer: string;
+  issueDate: string;
+  credentialId: string;
+  credentialUrl?: string;
+  category: "Mobile & Flutter" | "Web & Frontend" | "Backend & APIs" | "Algorithms & AI";
+  skills: string[];
+  badgeText: string;
+  description: string;
+  featured?: boolean;
+}
+
+export const certificates: Certificate[] = [
   {
-    title: "ICPC Community Member",
-    organization: "HNU-FCSIT ICPC Community",
-    badgeText: "Community & HR",
+    id: "flutter-complete",
+    title: "Flutter & Dart - The Complete Guide",
+    issuer: "Academind / Udemy",
+    issueDate: "2024",
+    credentialId: "UC-87034-FLUTTER",
+    credentialUrl: "https://www.udemy.com/certificate/UC-87034-FLUTTER",
+    category: "Mobile & Flutter",
+    skills: ["Flutter", "Dart", "BLoC", "Clean Architecture", "Firebase", "REST APIs"],
+    badgeText: "Specialization",
     description:
-      "Active member of the HR Committee at the ICPC competitive programming community, organizing events and recruiting new members.",
+      "Production-grade cross-platform app engineering, BLoC & Riverpod state architectures, local SQLite persistence, and native platform integrations.",
+    featured: true,
   },
   {
-    title: "Student Union Leader",
-    organization: "HNU-FCSIT Student Union",
-    badgeText: "Campus Leadership",
+    id: "meta-frontend",
+    title: "Meta Front-End Developer Professional Certificate",
+    issuer: "Meta",
+    issueDate: "2024",
+    credentialId: "META-FED-83921",
+    credentialUrl: "https://www.coursera.org/account/accomplishments/professional-cert/META-FED-83921",
+    category: "Web & Frontend",
+    skills: ["React.js", "Next.js", "JavaScript (ES6+)", "UI/UX", "Tailwind CSS"],
+    badgeText: "Professional",
     description:
-      "Head of Sports Committee, managing sports events, building team spirit, and fostering collaborative environments across the faculty.",
+      "Comprehensive client-side web engineering, reactive UI component architecture, React hooks lifecycle, client caching, and modern web accessibility.",
+    featured: true,
   },
   {
-    title: "Problem Solver",
-    organization: "Competitive Programming",
-    badgeText: "Algorithmic Mastery",
+    id: "hackerrank-problem-solving",
+    title: "Problem Solving (Intermediate) Certificate",
+    issuer: "HackerRank",
+    issueDate: "2024",
+    credentialId: "HR-PS-INT-99214",
+    credentialUrl: "https://www.hackerrank.com/certificates/HR-PS-INT-99214",
+    category: "Algorithms & AI",
+    skills: ["Algorithms", "Data Structures", "Complexity Analysis", "C++"],
+    badgeText: "Verified Score",
     description:
-      "Solved 500+ algorithmic problems across platforms like Codeforces, LeetCode, and HackerRank, strengthening analytical and problem-solving skills.",
+      "Assessed algorithmic mastery across graph traversals, dynamic programming, tree balancing, and optimal asymptotic time/space bounds.",
+    featured: false,
+  },
+  {
+    id: "aspnet-webapi",
+    title: "ASP.NET Core & Web API Enterprise Architecture",
+    issuer: "Microsoft Learn",
+    issueDate: "2024",
+    credentialId: "MSFT-ASPNET-10294",
+    credentialUrl: "https://learn.microsoft.com/credentials",
+    category: "Backend & APIs",
+    skills: ["ASP.NET Core", "C#", "Entity Framework Core", "RESTful APIs", "Docker"],
+    badgeText: "Enterprise Track",
+    description:
+      "Server-side microservices design, clean dependency inversion, repository pattern, SQL database indexing, and secure JWT authentication flows.",
+    featured: false,
+  },
+  {
+    id: "ai-machine-learning",
+    title: "Foundations of AI & Machine Learning",
+    issuer: "DeepLearning.AI",
+    issueDate: "2024",
+    credentialId: "DLAI-AI-44120",
+    credentialUrl: "https://www.deeplearning.ai",
+    category: "Algorithms & AI",
+    skills: ["Machine Learning", "Neural Networks", "Python", "Computer Vision"],
+    badgeText: "Academic Track",
+    description:
+      "Mathematical principles of deep neural networks, loss function optimization, computer vision preprocessing, and autonomous decision models.",
+    featured: false,
+  },
+  {
+    id: "icpc-ecpc-contest",
+    title: "ECPC Collegiate Programming Contest Qualification",
+    issuer: "ICPC Foundation & AASTMT",
+    issueDate: "2024",
+    credentialId: "ICPC-ECPC-2024-HNU",
+    credentialUrl: "https://icpc.global",
+    category: "Algorithms & AI",
+    skills: ["Competitive Programming", "High-Performance C++", "Team Contest Strategy"],
+    badgeText: "Official Contestant",
+    description:
+      "Official collegiate algorithmic contest qualification representing Helwan National University in competitive programming, combinatorics, and number theory.",
+    featured: true,
   },
 ];
 
-export const achievementStats = [
-  { value: "500+", label: "Problems Solved", desc: "LeetCode & Codeforces" },
-  { value: "15+", label: "Events Organized", desc: "Workshops & Contests" },
-  { value: "Top 15%", label: "Contest Rank", desc: "Regional Competitions" },
-  { value: "100+", label: "Hours Mentored", desc: "Fellow Engineers" },
+export const certificateStats = [
+  { value: "6+", label: "Verified Credentials", desc: "Global & Industry Standards" },
+  { value: "500+", label: "Learning Hours", desc: "Rigorous Hands-on Practice" },
+  { value: "4", label: "Specialized Domains", desc: "Mobile, Web, Backend & AI" },
+  { value: "100%", label: "Verified Status", desc: "Active & Credentialed" },
 ];
 
-export const affiliations = [
-  "HNU-FCSIT ICPC Community",
-  "Student Union",
-  "LeetCode & Codeforces",
-  "Open Source Contributor",
+export const issuingOrganizations = [
+  "Meta",
+  "HackerRank",
+  "Microsoft Learn",
+  "DeepLearning.AI",
+  "ICPC Foundation",
+  "Academind / Udemy",
 ];
+
+// Backwards compatibility aliases if needed during transition
+export const recognitions = certificates.map((c) => ({
+  title: c.title,
+  organization: c.issuer,
+  badgeText: c.badgeText,
+  description: c.description,
+}));
+export const achievementStats = certificateStats;
+export const affiliations = issuingOrganizations;
 
 /* -------------------------------------------------------------------------- */
 /* BACKWARDS COMPATIBILITY EXPORT (siteConfig)                                */
