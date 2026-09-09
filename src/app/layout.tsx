@@ -11,6 +11,7 @@ const cascadiaCode = localFont({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://ahmedelgabbas.dev"),
   title: "Ahmed ElGabbas — Full-Stack Developer & Mobile Engineer",
   description:
     "Ahmed ElGabbas — Full-Stack Software Engineer & Mobile Application Developer. Building scalable systems with React, Next.js, Flutter, and .NET. Available for hire.",
@@ -32,12 +33,23 @@ export const metadata: Metadata = {
     description:
       "Engineering production-scale systems — from mobile apps to full-stack web platforms.",
     locale: "en_US",
+    siteName: "Ahmed ElGabbas Portfolio",
+    images: [
+      {
+        url: "/images/og.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Ahmed ElGabbas — Full-Stack Developer & Mobile Engineer",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Ahmed ElGabbas — Full-Stack Developer & Mobile Engineer",
     description:
       "Engineering production-scale systems — from mobile apps to full-stack web platforms.",
+    creator: "@A7med_ElGabbas",
+    images: ["/images/og.jpg"],
   },
 };
 
