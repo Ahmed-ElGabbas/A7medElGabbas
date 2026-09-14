@@ -10,14 +10,11 @@ import {
   Database,
   Wrench,
   Check,
-  Layers,
-  Cpu,
   Workflow,
   ShieldCheck,
   Terminal,
 } from "lucide-react";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Ticker } from "@/components/ui/ticker";
 import { cn } from "@/lib/utils";
@@ -111,7 +108,7 @@ export default function Skills() {
 
                 {/* Skills tags/cards */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {currentCategory.skills.map((skill, sIdx) => (
+                  {currentCategory.skills.map((skill) => (
                     <div
                       key={skill}
                       className="group flex items-center justify-between p-3 rounded-xl bg-background/60 border border-border/50 hover:border-primary/50 hover:bg-background transition-all duration-200"

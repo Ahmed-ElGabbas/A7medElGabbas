@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import {
   Code2,
-  Cpu,
   GraduationCap,
   MapPin,
   Sparkles,
@@ -20,7 +19,6 @@ import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { stats } from "@/constants";
-import { siteConfig } from "@/config/site";
 import { aboutData, personalInfo } from "@/data/portfolio";
 
 const factIcons = [GraduationCap, MapPin, Sparkles, Terminal];

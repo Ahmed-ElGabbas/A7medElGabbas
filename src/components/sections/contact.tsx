@@ -15,7 +15,6 @@ import {
   Facebook,
   MessageSquare,
   Clock,
-  Sparkles,
 } from "lucide-react";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Card, CardContent } from "@/components/ui/card";

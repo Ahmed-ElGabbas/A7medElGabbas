@@ -13,9 +13,9 @@ import {
   Sparkles,
   CheckCircle2,
   Calendar,
-  Layers,
   FileCheck2,
 } from "lucide-react";
+import CertificateModal from "@/components/CertificateModal";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -52,6 +52,7 @@ const issuerIcons: Record<string, React.ElementType> = {
 
 export default function Certificates() {
   const [activeCategory, setActiveCategory] = useState<string>("All");
+  const [activeCert, setActiveCert] = useState<Certificate | null>(null);
 
   const filteredCertificates =
     activeCategory === "All"
@@ -134,11 +135,27 @@ export default function Certificates() {
                 className="h-full flex"
               >
                 <Card
+                  onClick={cert.file ? () => setActiveCert(cert) : undefined}
+                  role={cert.file ? "button" : undefined}
+                  tabIndex={cert.file ? 0 : undefined}
+                  aria-haspopup={cert.file ? "dialog" : undefined}
+                  onKeyDown={
+                    cert.file
+                      ? (e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          setActiveCert(cert);
+                        }
+                      }
+                      : undefined
+                  }
                   className={cn(
                     "h-full w-full border-border/70 bg-card/70 hover:bg-card transition-all duration-300 flex flex-col justify-between p-6 sm:p-7 shadow-sm group hover:-translate-y-1",
                     isFeatured
                       ? "border-primary/50 shadow-primary/5 ring-1 ring-primary/20 hover:border-primary/70"
-                      : "hover:border-primary/40"
+                      : "hover:border-primary/40",
+                    cert.file &&
+                    "cursor-pointer focus-visible:outline-2 focus-visible:outline-primary/60"
                   )}
                 >
                   <CardContent className="p-0 flex-1 flex flex-col justify-between space-y-6">
@@ -210,11 +227,18 @@ export default function Certificates() {
                         <span className="truncate">ID: {cert.credentialId}</span>
                       </div>
 
-                      {cert.credentialUrl && (
+                      {(cert.file || cert.credentialUrl) && (
                         <a
-                          href={cert.credentialUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                          href={cert.file ? undefined : cert.credentialUrl}
+                          target={cert.file ? undefined : "_blank"}
+                          rel={cert.file ? undefined : "noopener noreferrer"}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            if (cert.file) {
+                              event.preventDefault();
+                              setActiveCert(cert);
+                            }
+                          }}
                           className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary hover:underline hover:opacity-80 transition-opacity shrink-0 group/link"
                         >
                           Verify
@@ -275,6 +299,16 @@ export default function Certificates() {
           </span>
         ))}
       </div>
+
+      <AnimatePresence>
+        {activeCert && (
+          <CertificateModal
+            key={activeCert.id}
+            certificate={activeCert}
+            onClose={() => setActiveCert(null)}
+          />
+        )}
+      </AnimatePresence>
     </section>
   );
 }

@@ -5,11 +5,9 @@ import {
   Briefcase,
   GraduationCap,
   Calendar,
-  Sparkles,
   Rocket,
   CheckCircle2,
   Building2,
-  Compass,
 } from "lucide-react";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Card, CardContent } from "@/components/ui/card";

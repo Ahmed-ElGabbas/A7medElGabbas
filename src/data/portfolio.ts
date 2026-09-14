@@ -29,14 +29,14 @@ export const personalInfo = {
   metaDescription:
     "Ahmed ElGabbas — Full-Stack Software Engineer & Mobile Application Developer. Building scalable systems with React, Next.js, Flutter, and .NET. Available for hire.",
   url: "https://ahmedelgabbas.dev",
-  photo: "/images/main.jpg",
+  photo: "/assets/main.png.jpeg",
   resumePath: "/assets/Ahmed-Mahmoud-Ahmed-Elgabbas-FlowCV-Resume-20241202.pdf",
   location: "Cairo, Egypt",
   status: "Available for Hire",
   statusSubtext: "Open to Collaborations",
   headline:
     "Engineering high-performance mobile applications, robust full-stack web platforms, and intelligent robotics software with clean architecture.",
-  
+
   // Rotating roles displayed in the hero section
   roles: [
     "Full-Stack Developer",
@@ -301,7 +301,7 @@ export const education = [
   {
     degree: "B.Sc. Computer Science & Artificial Intelligence",
     institution: "Helwan National University",
-    period: "2023 — 2027",
+    period: "2024 — 2028",
     description:
       "Specializing in Robotics Software Engineering. Coursework includes Data Structures, Algorithms, OOP, Database Systems, Software Engineering, and AI fundamentals.",
     gpa: "Currently pursuing",
@@ -396,79 +396,11 @@ export interface Certificate {
   badgeText: string;
   description: string;
   featured?: boolean;
+  previewImage?: string;
+  file?: string;
 }
 
 export const certificates: Certificate[] = [
-  {
-    id: "flutter-complete",
-    title: "Flutter & Dart - The Complete Guide",
-    issuer: "Academind / Udemy",
-    issueDate: "2024",
-    credentialId: "UC-87034-FLUTTER",
-    credentialUrl: "https://www.udemy.com/certificate/UC-87034-FLUTTER",
-    category: "Mobile & Flutter",
-    skills: ["Flutter", "Dart", "BLoC", "Clean Architecture", "Firebase", "REST APIs"],
-    badgeText: "Specialization",
-    description:
-      "Production-grade cross-platform app engineering, BLoC & Riverpod state architectures, local SQLite persistence, and native platform integrations.",
-    featured: true,
-  },
-  {
-    id: "meta-frontend",
-    title: "Meta Front-End Developer Professional Certificate",
-    issuer: "Meta",
-    issueDate: "2024",
-    credentialId: "META-FED-83921",
-    credentialUrl: "https://www.coursera.org/account/accomplishments/professional-cert/META-FED-83921",
-    category: "Web & Frontend",
-    skills: ["React.js", "Next.js", "JavaScript (ES6+)", "UI/UX", "Tailwind CSS"],
-    badgeText: "Professional",
-    description:
-      "Comprehensive client-side web engineering, reactive UI component architecture, React hooks lifecycle, client caching, and modern web accessibility.",
-    featured: true,
-  },
-  {
-    id: "hackerrank-problem-solving",
-    title: "Problem Solving (Intermediate) Certificate",
-    issuer: "HackerRank",
-    issueDate: "2024",
-    credentialId: "HR-PS-INT-99214",
-    credentialUrl: "https://www.hackerrank.com/certificates/HR-PS-INT-99214",
-    category: "Algorithms & AI",
-    skills: ["Algorithms", "Data Structures", "Complexity Analysis", "C++"],
-    badgeText: "Verified Score",
-    description:
-      "Assessed algorithmic mastery across graph traversals, dynamic programming, tree balancing, and optimal asymptotic time/space bounds.",
-    featured: false,
-  },
-  {
-    id: "aspnet-webapi",
-    title: "ASP.NET Core & Web API Enterprise Architecture",
-    issuer: "Microsoft Learn",
-    issueDate: "2024",
-    credentialId: "MSFT-ASPNET-10294",
-    credentialUrl: "https://learn.microsoft.com/credentials",
-    category: "Backend & APIs",
-    skills: ["ASP.NET Core", "C#", "Entity Framework Core", "RESTful APIs", "Docker"],
-    badgeText: "Enterprise Track",
-    description:
-      "Server-side microservices design, clean dependency inversion, repository pattern, SQL database indexing, and secure JWT authentication flows.",
-    featured: false,
-  },
-  {
-    id: "ai-machine-learning",
-    title: "Foundations of AI & Machine Learning",
-    issuer: "DeepLearning.AI",
-    issueDate: "2024",
-    credentialId: "DLAI-AI-44120",
-    credentialUrl: "https://www.deeplearning.ai",
-    category: "Algorithms & AI",
-    skills: ["Machine Learning", "Neural Networks", "Python", "Computer Vision"],
-    badgeText: "Academic Track",
-    description:
-      "Mathematical principles of deep neural networks, loss function optimization, computer vision preprocessing, and autonomous decision models.",
-    featured: false,
-  },
   {
     id: "icpc-ecpc-contest",
     title: "ECPC Collegiate Programming Contest Qualification",
@@ -482,6 +414,68 @@ export const certificates: Certificate[] = [
     description:
       "Official collegiate algorithmic contest qualification representing Helwan National University in competitive programming, combinatorics, and number theory.",
     featured: true,
+    previewImage: "/assets/certificates/ecpc-preview.jpg.jpeg",
+    file: "/assets/certificates/2026-ECPC Q 4-Ahmed ELGabbas-PLACE (2)-1.pdf",
+  },
+  {
+    id: "iti",
+    title: "Introduction to Software Testing Concepts & Techniques",
+    issuer: "ITI Platform",
+    issueDate: "20/01/26",
+    credentialId: "EITP6DSUGq",
+    category: "Web & Frontend",
+    skills: ["Software Testing", "Testing Concepts", "Testing Techniques"],
+    badgeText: "Completion",
+    description:
+      "Completion certificate for the Introduction to Software Testing Concepts & Techniques course issued by the ITI Platform.",
+    featured: false,
+    previewImage: "/assets/certificates/iti-preview.jpg.jpeg",
+    file: "/assets/certificates/Certificate iti.pdf",
+  },
+  {
+    id: "database",
+    title: "Database Fundamentals",
+    issuer: "ITI Platform",
+    issueDate: "20/01/26",
+    credentialId: "7KalJ2PlJ1",
+    category: "Backend & APIs",
+    skills: ["Databases", "Database Fundamentals", "SQL"],
+    badgeText: "Completion",
+    description:
+      "Completion certificate for the Database Fundamentals course issued by the ITI Platform.",
+    featured: false,
+    previewImage: "/assets/certificates/database-preview.jpg.jpeg",
+    file: "/assets/certificates/Certificates Database.pdf",
+  },
+  {
+    id: "software-engineer",
+    title: "Software Engineer",
+    issuer: "HackerRank",
+    issueDate: "21 Jan, 2026",
+    credentialId: "A5E88E74A78D",
+    category: "Backend & APIs",
+    skills: ["Software Engineering", "Problem Solving", "Programming"],
+    badgeText: "Role Certification",
+    description:
+      "HackerRank role certification confirming that the bearer passed the Software Engineer certification test.",
+    featured: false,
+    previewImage: "/assets/certificates/swe-preview.jpg.jpeg",
+    file: "/assets/certificates/software_engineer certificate-1.pdf",
+  },
+  {
+    id: "software-engineer-intern",
+    title: "Software Engineer Intern",
+    issuer: "HackerRank",
+    issueDate: "01 Mar, 2026",
+    credentialId: "0BA671170530",
+    category: "Backend & APIs",
+    skills: ["Software Engineering", "Problem Solving", "Programming"],
+    badgeText: "Role Certification",
+    description:
+      "HackerRank role certification confirming that the bearer passed the Software Engineer Intern certification test.",
+    featured: false,
+    previewImage: "/assets/certificates/intern-preview.jpg.jpeg",
+    file: "/assets/certificates/software_engineer_intern certificate-1.pdf",
   },
 ];
 

@@ -10,10 +10,9 @@ import {
   Mail,
   Download,
   ArrowDown,
-  MapPin,
   Briefcase,
 } from "lucide-react";
-import Image from "next/image";
+import ProfileFrame from "@/components/ui/profile-frame";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { siteConfig } from "@/config/site";
@@ -224,37 +223,14 @@ export default function Hero() {
           </motion.div>
 
           {/* Right — Profile photo */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.5, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="relative flex items-center justify-center"
-          >
-            <div className="relative">
-              {/* Gold ring border */}
-              <div
-                className="absolute -inset-2 rounded-3xl"
-                style={{
-                  background:
-                    "linear-gradient(135deg, rgba(212,175,55,0.5), rgba(245,215,110,0.15), rgba(212,175,55,0.35))",
-                  filter: "blur(1px)",
-                }}
-              />
-              <div className="relative w-72 h-72 sm:w-80 sm:h-80 md:w-96 md:h-96 rounded-3xl overflow-hidden border-2 border-primary/30 bg-card">
-                <Image
-                  src="/images/main.jpg"
-                  alt="Ahmed ElGabbas — Full-Stack Developer & Mobile Engineer"
-                  fill
-                  className="object-cover"
-                  priority
-                  sizes="(max-width: 768px) 288px, (max-width: 1024px) 320px, 384px"
-                />
-              </div>
-              {/* Floating accent dot */}
-              <div className="absolute -top-4 -right-4 w-8 h-8 rounded-full bg-primary/80 animate-float-soft" />
-              <div className="absolute -bottom-3 -left-3 w-6 h-6 rounded-full border-2 border-primary/50 animate-float" />
-            </div>
-          </motion.div>
+          <div className="relative flex items-center justify-center">
+            <ProfileFrame
+              imageSrc={personalInfo.photo}
+              imageAlt={`${personalInfo.name} — ${personalInfo.title}`}
+              name=""
+              label=""
+            />
+          </div>
         </div>
 
         {/* Stats strip */}
@@ -264,7 +240,7 @@ export default function Hero() {
           transition={{ delay: 1.2, duration: 0.6 }}
           className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-4"
         >
-          {stats.map((stat, i) => (
+          {stats.map((stat) => (
             <div
               key={stat.label}
               className="glass-card p-5 text-center"

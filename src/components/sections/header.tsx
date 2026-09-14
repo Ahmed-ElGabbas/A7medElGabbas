@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Sun, Moon, Github, Linkedin, Mail, Rocket } from "lucide-react";
 import Image from "next/image";
@@ -11,12 +11,29 @@ import { Button } from "@/components/ui/button";
 
 type Theme = "dark" | "light";
 
+const THEME_KEY = "theme";
+const DEFAULT_THEME: Theme = "dark";
+
+function getStoredTheme(): Theme {
+  if (typeof window === "undefined") return DEFAULT_THEME;
+  try {
+    const stored = window.localStorage.getItem(THEME_KEY);
+    return stored === "light" || stored === "dark" ? stored : DEFAULT_THEME;
+  } catch {
+    return DEFAULT_THEME;
+  }
+}
+
+function subscribeTheme(callback: () => void) {
+  window.addEventListener("storage", callback);
+  return () => window.removeEventListener("storage", callback);
+}
+
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [theme, setTheme] = useState<Theme>("dark");
-  const [mounted, setMounted] = useState(false);
   const toggleRef = useRef<HTMLButtonElement>(null);
+  const theme = useSyncExternalStore(subscribeTheme, getStoredTheme, () => DEFAULT_THEME);
 
   const sectionIds = navItems.map((item) => item.href.replace("#", ""));
   const activeId = useScrollspy(sectionIds, 150);
@@ -38,20 +55,18 @@ export default function Header() {
   }, [isMobileOpen]);
 
   useEffect(() => {
-    setMounted(true);
-    try {
-      const stored = localStorage.getItem("theme");
-      if (stored === "light" || stored === "dark") setTheme(stored);
-    } catch { /* noop */ }
-  }, []);
+    const root = document.documentElement;
+    root.classList.toggle("dark", theme === "dark");
+    root.classList.toggle("light", theme === "light");
+  }, [theme]);
 
   const toggleTheme = () => {
     const next: Theme = theme === "dark" ? "light" : "dark";
-    setTheme(next);
-    try { localStorage.setItem("theme", next); } catch { /* noop */ }
+    try { window.localStorage.setItem(THEME_KEY, next); } catch { /* noop */ }
     const root = document.documentElement;
     root.classList.toggle("dark", next === "dark");
     root.classList.toggle("light", next === "light");
+    window.dispatchEvent(new Event("storage"));
   };
 
   useEffect(() => {
@@ -117,7 +132,7 @@ export default function Header() {
           animate={isScrolled ? {
             backdropFilter: "blur(20px)",
             backgroundColor: "hsl(var(--card) / 0.85)",
-            borderColor: "hsl(var(--border))",
+            borderColor: "var(--color-accent)",
             boxShadow: "var(--shadow-lg)",
           } : {
             backdropFilter: "blur(0px)",
@@ -180,20 +195,20 @@ export default function Header() {
               variant="outline"
               size="icon"
               onClick={toggleTheme}
-              aria-label={mounted ? `Switch to ${theme === "dark" ? "light" : "dark"} mode` : "Toggle theme"}
+              aria-label={
+                theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
+              }
               className="rounded-full w-9 h-9"
             >
               <AnimatePresence mode="wait" initial={false}>
-                {mounted && theme === "dark" ? (
+                {theme === "dark" ? (
                   <motion.span key="sun" initial={{ opacity: 0, rotate: -90 }} animate={{ opacity: 1, rotate: 0 }} exit={{ opacity: 0, rotate: 90 }} transition={{ duration: 0.2 }}>
                     <Sun size={15} />
                   </motion.span>
-                ) : mounted && theme === "light" ? (
+                ) : (
                   <motion.span key="moon" initial={{ opacity: 0, rotate: 90 }} animate={{ opacity: 1, rotate: 0 }} exit={{ opacity: 0, rotate: -90 }} transition={{ duration: 0.2 }}>
                     <Moon size={15} />
                   </motion.span>
-                ) : (
-                  <Moon size={15} />
                 )}
               </AnimatePresence>
             </Button>
