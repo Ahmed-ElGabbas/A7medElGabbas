@@ -1,0 +1,387 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===========================================================================
+// Enums
+// ===========================================================================
+
+/// Hard enum — matches the existing 4-value filtering logic in
+/// src/components/sections/certificates.tsx. Unlike projects.category, which
+/// is free text, changing this set requires a schema migration.
+enum CertificateCategory {
+  MOBILE_FLUTTER
+  WEB_FRONTEND
+  BACKEND_APIS
+  ALGORITHMS_AI
+}
+
+enum MediaKind {
+  IMAGE
+  PDF
+}
+
+// ===========================================================================
+// Auth
+// ===========================================================================
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  /// bcrypt hash only. Plaintext is never stored, logged, or committed.
+  passwordHash String   @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("admin_users")
+}
+
+// ===========================================================================
+// Site config singletons
+// ===========================================================================
+
+/// Singleton, id = 1.
+model SiteConfig {
+  id                Int      @id @default(1)
+  name              String
+  /// Rendered as separate spans in Hero and Footer; previously hardcoded in JSX.
+  firstName         String?  @map("first_name")
+  lastName          String?  @map("last_name")
+  title             String
+  metaDescription   String   @map("meta_description")
+  url               String?
+  headline          String?
+  photoUrl          String?  @map("photo_url")
+  resumeUrl         String?  @map("resume_url")
+  location          String?
+  status            String?
+  statusSubtext     String?  @map("status_subtext")
+  /// Rotating roles shown in the Hero typewriter.
+  roles             String[] @default([])
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@map("site_config")
+}
+
+/// Singleton, id = 1.
+model SocialLinks {
+  id        Int       @id @default(1)
+  email     String?
+  phone     String?
+  github    String?
+  linkedin  String?
+  twitter   String?
+  facebook  String?
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  @@map("social_links")
+}
+
+/// Singleton, id = 1. Section headings (index / label / title / subtitle) for
+/// About, Skills, Experience, Projects, Certificates, Contact. Previously
+/// literals inside each section component.
+model SectionMeta {
+  id       Int     @id @default(1)
+  /// Stable machine key the frontend uses to look up this row, e.g. "projects".
+  key      String  @unique
+  /// Display index shown in the section heading, e.g. "04".
+  index    String?
+  label    String?
+  title    String
+  subtitle String?
+  order    Int     @default(0)
+
+  @@map("section_meta")
+}
+
+// ===========================================================================
+// Navigation
+// ===========================================================================
+
+model NavItem {
+  id        String   @id @default(cuid())
+  label     String
+  /// Anchor-based, e.g. "#about".
+  href      String
+  order     Int      @default(0)
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([order])
+  @@map("nav_items")
+}
+
+// ===========================================================================
+// Hero stats (shared by Hero and About)
+// ===========================================================================
+
+model Stat {
+  id        String   @id @default(cuid())
+  value     String
+  label     String
+  order     Int      @default(0)
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([order])
+  @@map("stats")
+}
+
+// ===========================================================================
+// About
+// ===========================================================================
+
+/// Singleton, id = 1.
+model AboutContent {
+  id                      Int      @id @default(1)
+  sectionSubtitle         String?  @map("section_subtitle")
+  narrativeTitle          String?  @map("narrative_title")
+  paragraphs              String[] @default([])
+  highlights              String[] @default([])
+  academicFocusTitle      String?  @map("academic_focus_title")
+  academicFocusDescription String? @map("academic_focus_description")
+  updatedAt               DateTime @updatedAt @map("updated_at")
+
+  quickFacts QuickFact[]
+
+  @@map("about_content")
+}
+
+model QuickFact {
+  id         String   @id @default(cuid())
+  label      String
+  value      String
+  detail     String?
+  /// Icon key resolved by the frontend icon map. Currently chosen positionally
+  /// in about.tsx; becomes the keying source in Stage 3.
+  icon       String?
+  order      Int      @default(0)
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  aboutId    Int      @map("about_id")
+
+  about AboutContent @relation(fields: [aboutId], references: [id], onDelete: Cascade)
+
+  @@index([order])
+  @@map("quick_facts")
+}
+
+// ===========================================================================
+// Skills
+// ===========================================================================
+
+model SkillCategory {
+  id        String   @id @default(cuid())
+  title     String
+  /// Icon key resolved by the frontend icon map (code, layout, smartphone, ...).
+  icon      String?
+  order     Int      @default(0)
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  skills     Skill[]
+  spotlight  SkillSpotlight?
+
+  @@index([order])
+  @@map("skill_categories")
+}
+
+model Skill {
+  id         String   @id @default(cuid())
+  name       String
+  order      Int      @default(0)
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  categoryId String   @map("category_id")
+
+  category SkillCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@index([order])
+  @@map("skills")
+}
+
+/// One per category, so this is a 1:1 relation on skill_categories.
+model SkillSpotlight {
+  id             String   @id @default(cuid())
+  summary        String?
+  patterns       String[] @default([])
+  primaryProject String?  @map("primary_project")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  categoryId     String   @unique @map("category_id")
+
+  category SkillCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@map("skill_spotlights")
+}
+
+/// Singleton, id = 1.
+model PhilosophyQuote {
+  id        Int      @id @default(1)
+  quote     String
+  author    String?
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("philosophy_quote")
+}
+
+model TickerSkill {
+  id        String   @id @default(cuid())
+  label     String
+  order     Int      @default(0)
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([order])
+  @@map("ticker_skills")
+}
+
+// ===========================================================================
+// Experience & Education
+// ===========================================================================
+
+model Experience {
+  id           String   @id @default(cuid())
+  role         String
+  company      String
+  period       String
+  description  String
+  technologies String[] @default([])
+  order        Int      @default(0)
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@index([order])
+  @@map("experiences")
+}
+
+model Education {
+  id          String   @id @default(cuid())
+  degree      String
+  institution String
+  period      String
+  description String?
+  gpa         String?
+  courses     String[] @default([])
+  order       Int      @default(0)
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([order])
+  @@map("education")
+}
+
+/// Singleton, id = 1.
+model FutureGoals {
+  id          Int      @id @default(1)
+  title       String
+  description String?
+  items       String[] @default([])
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("future_goals")
+}
+
+// ===========================================================================
+// Projects
+// ===========================================================================
+
+model Project {
+  id           String   @id @default(cuid())
+  title        String
+  description  String
+  technologies String[] @default([])
+  /// Free text on purpose — new categories can be added from the admin without
+  /// a migration. The admin surfaces existing distinct values as suggestions.
+  category     String
+  featured     Boolean  @default(false)
+  /// New fields, not present in the current static data.
+  imageUrl     String?  @map("image_url")
+  githubUrl    String?  @map("github_url")
+  demoUrl      String?  @map("demo_url")
+  order        Int      @default(0)
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@index([order])
+  @@map("projects")
+}
+
+// ===========================================================================
+// Certificates
+// ===========================================================================
+
+model Certificate {
+  id              String             @id @default(cuid())
+  title           String
+  issuer          String
+  issueDate       String             @map("issue_date")
+  credentialId    String             @map("credential_id")
+  credentialUrl   String?            @map("credential_url")
+  category        CertificateCategory
+  skills          String[]           @default([])
+  badgeText       String             @map("badge_text")
+  description     String
+  featured        Boolean            @default(false)
+  previewImageUrl String?            @map("preview_image_url")
+  /// Frontend picks PDF vs image by extension test on this value.
+  fileUrl         String?            @map("file_url")
+  order           Int                @default(0)
+  updatedAt       DateTime           @updatedAt @map("updated_at")
+
+  @@index([order])
+  @@map("certificates")
+}
+
+model CertificateStat {
+  id        String   @id @default(cuid())
+  value     String
+  label     String
+  desc      String?
+  order     Int      @default(0)
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([order])
+  @@map("certificate_stats")
+}
+
+model IssuingOrganization {
+  id        String   @id @default(cuid())
+  name      String
+  order     Int      @default(0)
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([order])
+  @@map("issuing_organizations")
+}
+
+// ===========================================================================
+// Contact
+// ===========================================================================
+
+model ContactSubmission {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String
+  message   String
+  /// Hashed rather than stored raw; see ContactService.
+  ipHash    String?  @map("ip_hash")
+  userAgent String?  @map("user_agent")
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([read])
+  @@index([createdAt])
+  @@map("contact_submissions")
+}
+
+// ===========================================================================
+// Media
+// ===========================================================================
+
+model MediaAsset {
+  id               String   @id @default(cuid())
+  url              String
+  kind             MediaKind
+  originalFilename String?  @map("original_filename")
+  size             Int?
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  @@map("media_assets")
+}
