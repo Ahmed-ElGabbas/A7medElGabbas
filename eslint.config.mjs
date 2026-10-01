@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Vendored static assets:
     "public/**",
+    // Backend has its own ESLint + tsconfig setup.
+    "backend/**",
   ]),
 ]);
 
