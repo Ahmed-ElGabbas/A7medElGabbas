@@ -7,6 +7,8 @@ import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { SiteConfigModule } from './site-config/site-config.module';
 import { NavModule } from './nav/nav.module';
+import { ProjectsModule } from './projects/projects.module';
+import { CertificatesModule } from './certificates/certificates.module';
 import { MediaModule } from './media/media.module';
 import { HealthController } from './health.controller';
 
@@ -17,6 +19,8 @@ import { HealthController } from './health.controller';
     AuthModule,
     SiteConfigModule,
     NavModule,
+    ProjectsModule,
+    CertificatesModule,
     MediaModule,
   ],
   controllers: [HealthController],
