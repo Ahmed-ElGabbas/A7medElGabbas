@@ -4,16 +4,17 @@ import Link from "next/link";
 import { ExternalLink, Home } from "lucide-react";
 
 const SECTIONS = [
-  { label: "Site config", state: "Stage 0" },
-  { label: "Navigation", state: "Stage 0" },
-  { label: "Projects", state: "Stage 1" },
-  { label: "Certificates", state: "Stage 1" },
-  { label: "Contact inbox", state: "Stage 2" },
-  { label: "Hero & stats", state: "Stage 3" },
-  { label: "About", state: "Stage 3" },
-  { label: "Skills", state: "Stage 3" },
-  { label: "Experience", state: "Stage 3" },
-];
+  { label: "Site config", href: null, state: "Stage 0" },
+  { label: "Navigation", href: null, state: "Stage 0" },
+  { label: "Projects", href: "/admin/projects", state: "Stage 1" },
+  { label: "Certificates", href: "/admin/certificates", state: "Stage 1" },
+  { label: "Media", href: "/admin/media", state: "Stage 1" },
+  { label: "Contact inbox", href: null, state: "Stage 2" },
+  { label: "Hero & stats", href: null, state: "Stage 3" },
+  { label: "About", href: null, state: "Stage 3" },
+  { label: "Skills", href: null, state: "Stage 3" },
+  { label: "Experience", href: null, state: "Stage 3" },
+] as const;
 
 export default function AdminDashboardClient() {
   return (
@@ -54,17 +55,33 @@ export default function AdminDashboardClient() {
         </h2>
 
         <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {SECTIONS.map((section) => (
-            <li
-              key={section.label}
-              className="flex items-center justify-between rounded-lg border border-border px-4 py-3"
-            >
-              <span className="text-sm">{section.label}</span>
-              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                {section.state}
-              </span>
-            </li>
-          ))}
+          {SECTIONS.map((section) => {
+            const body = (
+              <>
+                <span className="text-sm">{section.label}</span>
+                <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                  {section.state}
+                </span>
+              </>
+            );
+
+            const className =
+              "flex items-center justify-between rounded-lg border border-border px-4 py-3";
+
+            // Sections from a later stage have no route yet, so they stay
+            // inert instead of linking to a 404.
+            return section.href ? (
+              <li key={section.label}>
+                <Link href={section.href} className={`${className} transition-colors hover:border-accent-gold hover:bg-accent/10`}>
+                  {body}
+                </Link>
+              </li>
+            ) : (
+              <li key={section.label} className={className}>
+                {body}
+              </li>
+            );
+          })}
         </ul>
       </section>
     </div>
