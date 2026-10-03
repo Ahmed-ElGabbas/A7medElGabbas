@@ -326,7 +326,57 @@ variables, matching the "local only" note in `backend/.env.example`. They are
 supplied inline for a single `railway ssh` invocation instead, so the credentials
 exist in exactly one place at exactly one moment.
 
-### 5. `railway.json` is deprecated in favour of `.railway/railway.ts`
+### 5. `/health` verifies the schema, not just the connection
+
+`/health` originally ran `SELECT 1` and nothing else. That is a valid liveness
+probe and a useless readiness probe: `SELECT 1` succeeds against a completely
+empty database.
+
+This was not theoretical. The first production deploy was reported `SUCCESS`
+with an empty database — zero tables, both migrations unapplied — because the
+migration step never ran (decision 6) and the health check could not tell the
+difference. Railway would have promoted that build indefinitely.
+
+`/health` now asserts every table backing a Prisma model exists and that no row
+in `_prisma_migrations` is unfinished or rolled back, returning `503` with the
+missing table names otherwise. The 22 checked names are the `@@map` targets in
+`schema.prisma`, so they are asserted against the same source of truth as the
+models. Covered by `health-schema.spec.ts`.
+
+Deliberately still a cheap query pair rather than a row-count sweep: this runs on
+every deploy's health probe and must not become a load test.
+
+### 6. `preDeployCommand` is configured but was silently skipped
+
+`deploy.preDeployCommand` is set to `cd backend && npm run prisma:deploy` in
+`railway.json`. It did **not** run on either deploy, while `buildCommand`,
+`startCommand`, and `healthcheckPath` from the same file were all honoured — the
+Nixpacks plan banner shows our build command and the container runs our start
+command. Build-phase output is visible in `railway logs --build`, and there is no
+`migrate deploy` output anywhere, so this is a genuine skip rather than a logging
+gap. The schema permits `preDeployCommand` as either a string or a one-item array,
+so the string form is not the problem.
+
+Not yet root-caused. The migrations were applied manually over SSH, which means
+**this is unresolved and a future deploy will not migrate automatically.** Mitigations
+in place: the hardened `/health` (decision 5) now fails such a deployment loudly,
+and `prisma migrate status` over SSH is the manual check. The likely durable fix is
+migrating to Infrastructure as Code (decision 8), which is also the only path that
+survives the 2026-12-01 cutoff.
+
+### 7. Production schema was applied over SSH, and verified against local
+
+With `preDeployCommand` skipped, both migrations were applied manually:
+
+```
+cd /app/backend && npx prisma migrate deploy
+```
+
+Verified in the running container against `information_schema`: **23 tables**
+(22 models plus `_prisma_migrations`) and 2 finished migrations — identical to the
+local `portfolio_dev` baseline. Seed has **not** been run yet.
+
+### 8. `railway.json` is deprecated in favour of `.railway/railway.ts`
 
 Every Railway CLI call now emits:
 
@@ -334,7 +384,15 @@ Every Railway CLI call now emits:
 > Infrastructure as Code (.railway/railway.ts). Existing files keep working
 > until 2026-12-01.
 
-The current file works and this deployment is unaffected, so no migration is
-attempted now. **Action required before 2026-12-01:** either run
-`railway config migrate` or hand-write `.railway/railway.ts` for
-`portfolio-backend`. Deliberately deferred rather than done mid-deployment.
+The current file works for build, start, and healthcheck, so this deployment is
+unaffected. Two things raise the stakes beyond the deadline, though:
+
+- The docs state that **new services cannot opt into Config as Code** at all.
+  `portfolio-backend` was created during this deployment, which may be why
+  `preDeployCommand` was dropped (decision 6).
+- Existing files stop being read on 2026-12-01 (hard cutoff), not merely warn.
+
+**Action required before 2026-12-01:** run `railway config migrate`, or hand-write
+`.railway/railway.ts` for `portfolio-backend`. Deferred for now because it is a
+project-wide change that also manages variables and resources, and it should not
+be attempted in the middle of bringing the service up.
