@@ -11,6 +11,10 @@ import { ProjectsModule } from './projects/projects.module';
 import { CertificatesModule } from './certificates/certificates.module';
 import { MediaModule } from './media/media.module';
 import { ContactModule } from './contact/contact.module';
+import { HeroModule } from './hero/hero.module';
+import { AboutModule } from './about/about.module';
+import { SkillsModule } from './skills/skills.module';
+import { ExperienceModule } from './experience/experience.module';
 import { HealthController } from './health.controller';
 
 @Module({
@@ -24,6 +28,10 @@ import { HealthController } from './health.controller';
     CertificatesModule,
     MediaModule,
     ContactModule,
+    HeroModule,
+    AboutModule,
+    SkillsModule,
+    ExperienceModule,
   ],
   controllers: [HealthController],
   providers: [
