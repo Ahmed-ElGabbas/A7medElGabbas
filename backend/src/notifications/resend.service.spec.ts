@@ -3,7 +3,7 @@ import type { ConfigService } from '@nestjs/config';
 import { RESEND_TEST_FROM, ResendService } from './resend.service';
 
 /**
- * STUBBED LIVE SEND — the only place a real network call could happen is
+ * STUBBED LIVE SEND â€” the only place a real network call could happen is
  * `Resend.emails.send`, and the SDK module is mocked here so no test ever opens
  * a socket to Resend. Same approach as the R2 presign stub in Stage 1
  * (r2.storage.spec.ts).
@@ -22,7 +22,7 @@ jest.mock('resend', () => ({
 const FULL_ENV: Record<string, string> = {
   RESEND_API_KEY: 're_test_key',
   ADMIN_NOTIFICATION_EMAIL: 'owner@example.com',
-  FRONTEND_URL: 'https://ahmedelgabbas.dev',
+  FRONTEND_URL: 'https://www.ahmedelgabbas.me',
 };
 
 function makeService(values: Record<string, string> = FULL_ENV): ResendService {

@@ -28,7 +28,7 @@ export const personalInfo = {
   title: "Ahmed ElGabbas — Full-Stack Developer & Mobile Engineer",
   metaDescription:
     "Ahmed ElGabbas — Full-Stack Software Engineer & Mobile Application Developer. Building scalable systems with React, Next.js, Flutter, and .NET. Available for hire.",
-  url: "https://ahmedelgabbas.dev",
+  url: "https://www.ahmedelgabbas.me",
   photo: "/assets/main.png.jpeg",
   resumePath: "/assets/Ahmed-Mahmoud-Ahmed-Elgabbas-FlowCV-Resume-20241202.pdf",
   location: "Cairo, Egypt",

@@ -1,7 +1,7 @@
 import { adminSubmissionUrl, buildSubmissionEmail, escapeHtml } from './submission-email';
 import type { SubmissionForEmail } from './submission-email';
 
-const OPTIONS = { frontendUrl: 'https://ahmedelgabbas.dev' };
+const OPTIONS = { frontendUrl: 'https://www.ahmedelgabbas.me' };
 
 function submission(overrides: Partial<SubmissionForEmail> = {}): SubmissionForEmail {
   return {
@@ -25,7 +25,7 @@ describe('escapeHtml', () => {
   });
 
   it('leaves ordinary text untouched', () => {
-    expect(escapeHtml('Hello there, 123 — ok.')).toBe('Hello there, 123 — ok.');
+    expect(escapeHtml('Hello there, 123 â€” ok.')).toBe('Hello there, 123 â€” ok.');
   });
 });
 
@@ -118,7 +118,7 @@ describe('buildSubmissionEmail', () => {
     });
 
     it('includes the deep link in both renderings', () => {
-      const link = 'https://ahmedelgabbas.dev/admin/contact?submission=clx123abc';
+      const link = 'https://www.ahmedelgabbas.me/admin/contact?submission=clx123abc';
       expect(content.text).toContain(link);
       expect(content.html).toContain(link);
     });

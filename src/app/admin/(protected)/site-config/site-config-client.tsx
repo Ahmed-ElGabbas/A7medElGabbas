@@ -345,7 +345,7 @@ export default function SiteConfigClient({
                   id="sc-url"
                   value={config.url ?? ""}
                   onChange={(url) => setConfig({ ...config, url })}
-                  placeholder="https://ahmedelgabbas.dev"
+                  placeholder="https://www.ahmedelgabbas.me"
                   disabled={saving}
                 />
               </Field>

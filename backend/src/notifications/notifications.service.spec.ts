@@ -6,7 +6,7 @@ import type { SubmissionForEmail } from './submission-email';
 
 /**
  * The Resend transport is stubbed wholesale here, so nothing in this suite can
- * reach the network — the live-send boundary is confined to ResendService and is
+ * reach the network â€” the live-send boundary is confined to ResendService and is
  * covered (also stubbed) in resend.service.spec.ts.
  */
 function makeResend(overrides: Partial<Record<string, unknown>> = {}) {
@@ -14,7 +14,7 @@ function makeResend(overrides: Partial<Record<string, unknown>> = {}) {
     missingConfig: jest.fn().mockReturnValue([]),
     isConfigured: jest.fn().mockReturnValue(true),
     fromAddress: jest.fn().mockReturnValue('Portfolio <onboarding@resend.dev>'),
-    frontendUrl: jest.fn().mockReturnValue('https://ahmedelgabbas.dev'),
+    frontendUrl: jest.fn().mockReturnValue('https://www.ahmedelgabbas.me'),
     recipient: jest.fn().mockReturnValue('owner@example.com'),
     send: jest.fn().mockResolvedValue({ id: 'email-1' }),
     ...overrides,

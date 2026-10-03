@@ -46,7 +46,7 @@ export default function AdminDashboardClient({
             View live site
           </Link>
           <a
-            href="https://ahmedelgabbas.dev"
+            href="https://www.ahmedelgabbas.me"
             target="_blank"
             rel="noreferrer noopener"
             className="inline-flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs transition-colors hover:bg-accent"

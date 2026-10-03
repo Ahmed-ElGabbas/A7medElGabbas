@@ -11,7 +11,7 @@ const cascadiaCode = localFont({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://ahmedelgabbas.dev"),
+  metadataBase: new URL("https://www.ahmedelgabbas.me"),
   title: "Ahmed ElGabbas — Full-Stack Developer & Mobile Engineer",
   description:
     "Ahmed ElGabbas — Full-Stack Software Engineer & Mobile Application Developer. Building scalable systems with React, Next.js, Flutter, and .NET. Available for hire.",

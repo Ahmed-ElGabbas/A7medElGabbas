@@ -260,7 +260,7 @@ export default async function Image() {
                 letterSpacing: "0.5px",
               }}
             >
-              ahmedelgabbas.dev
+              ahmedelgabbas.me
             </span>
           </div>
         </div>
