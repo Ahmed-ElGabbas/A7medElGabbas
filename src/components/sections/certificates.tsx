@@ -20,20 +20,15 @@ import { SectionHeading } from "@/components/ui/section-heading";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import {
-  certificates,
-  certificateStats,
-  issuingOrganizations,
-  Certificate,
-} from "@/data/portfolio";
+import type {
+  CategoryOption,
+  CertificateItem,
+  CertificateStat,
+  IssuingOrganization,
+  ResolvedSectionMeta,
+} from "@/lib/content";
 
-const categories = [
-  "All",
-  "Mobile & Flutter",
-  "Web & Frontend",
-  "Backend & APIs",
-  "Algorithms & AI",
-] as const;
+const ALL = "All";
 
 const categoryIcons: Record<string, React.ElementType> = {
   All: Sparkles,
@@ -50,14 +45,40 @@ const issuerIcons: Record<string, React.ElementType> = {
   "Algorithms & AI": Terminal,
 };
 
-export default function Certificates() {
-  const [activeCategory, setActiveCategory] = useState<string>("All");
-  const [activeCert, setActiveCert] = useState<Certificate | null>(null);
+interface CertificatesProps {
+  certificates: CertificateItem[];
+  categories: CategoryOption[];
+  stats: CertificateStat[];
+  issuingOrganizations: IssuingOrganization[];
+  heading: ResolvedSectionMeta;
+}
+
+export default function Certificates({
+  certificates,
+  categories,
+  stats,
+  issuingOrganizations,
+  heading,
+}: CertificatesProps) {
+  const [activeCategory, setActiveCategory] = useState<string>(ALL);
+  const [activeCert, setActiveCert] = useState<CertificateItem | null>(null);
+
+  // The API is the source of the tab list. Guard against a stale selection so a
+  // category removed in the admin cannot leave the grid permanently empty.
+  const categoryValues = categories.map((c) => c.value);
+  const effectiveCategory = categoryValues.includes(activeCategory)
+    ? activeCategory
+    : ALL;
 
   const filteredCertificates =
-    activeCategory === "All"
+    effectiveCategory === ALL
       ? certificates
-      : certificates.filter((c) => c.category === activeCategory);
+      : certificates.filter((c) => c.category === effectiveCategory);
+
+  const labelFor = (value: string) =>
+    value === ALL
+      ? ALL
+      : (categories.find((c) => c.value === value)?.label ?? value);
 
   return (
     <section
@@ -69,22 +90,23 @@ export default function Certificates() {
       <div className="absolute bottom-1/4 left-0 w-80 h-80 rounded-full bg-primary/5 blur-3xl pointer-events-none" />
 
       <SectionHeading
-        index="05"
-        label="CREDENTIALS"
-        title="Licenses & Certifications"
-        subtitle="Verified technical credentials, specialized engineering tracks, and algorithmic problem-solving qualifications."
+        index={heading.index}
+        label={heading.label}
+        title={heading.title}
+        subtitle={heading.subtitle ?? ""}
       />
 
       {/* Category Filter Tabs */}
       <div className="mt-10 flex flex-wrap items-center justify-start sm:justify-center gap-2 sm:gap-3">
-        {categories.map((cat) => {
+        {[ALL, ...categoryValues].map((cat) => {
           const Icon = categoryIcons[cat] || Sparkles;
-          const isActive = activeCategory === cat;
+          const isActive = effectiveCategory === cat;
 
           return (
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
+              aria-pressed={isActive}
               className={cn(
                 "flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 border cursor-pointer select-none",
                 isActive
@@ -96,8 +118,8 @@ export default function Certificates() {
                 size={14}
                 className={isActive ? "text-primary-foreground" : "text-primary"}
               />
-              <span>{cat}</span>
-              {cat === "All" && (
+              <span>{labelFor(cat)}</span>
+              {cat === ALL && (
                 <span
                   className={cn(
                     "ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-mono",
@@ -120,7 +142,7 @@ export default function Certificates() {
         className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 items-stretch"
       >
         <AnimatePresence mode="popLayout">
-          {filteredCertificates.map((cert: Certificate, index: number) => {
+          {filteredCertificates.map((cert: CertificateItem, index: number) => {
             const Icon = issuerIcons[cert.category] || Award;
             const isFeatured = cert.featured;
 
@@ -266,10 +288,10 @@ export default function Certificates() {
         className="mt-14 p-6 sm:p-8 rounded-2xl bg-card border border-border/70 shadow-sm"
       >
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center divide-y md:divide-y-0 md:divide-x divide-border/40">
-          {certificateStats.map((stat, sIdx) => (
+          {stats.map((stat) => (
             <div
-              key={sIdx}
-              className={cn("space-y-1", sIdx > 0 ? "pt-4 md:pt-0" : "")}
+              key={stat.id}
+              className={cn("space-y-1", stats.indexOf(stat) > 0 ? "pt-4 md:pt-0" : "")}
             >
               <div className="font-display text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
                 <span className="text-primary">{stat.value}</span>
@@ -292,10 +314,10 @@ export default function Certificates() {
         </span>
         {issuingOrganizations.map((org) => (
           <span
-            key={org}
+            key={org.id}
             className="px-3 py-1 rounded-full bg-background border border-border/60 text-foreground/80 text-[11px] hover:border-primary/40 transition-colors"
           >
-            {org}
+            {org.name}
           </span>
         ))}
       </div>

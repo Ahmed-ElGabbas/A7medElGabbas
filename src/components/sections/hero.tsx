@@ -15,21 +15,29 @@ import {
 import ProfileFrame from "@/components/ui/profile-frame";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { siteConfig } from "@/config/site";
-import { stats } from "@/constants";
-import { personalInfo } from "@/data/portfolio";
+import type { SiteConfig, SocialLinks, Stat } from "@/lib/content";
+
+interface HeroProps {
+  site: SiteConfig;
+  links: SocialLinks;
+  stats: Stat[];
+}
 
 /* ------------------------------------------------------------------ */
 /* Role rotator                                                        */
 /* ------------------------------------------------------------------ */
-const roles = personalInfo.roles;
-
-function RoleRotator() {
+function RoleRotator({ roles }: { roles: string[] }) {
   const [index, setIndex] = useState(0);
+
   useEffect(() => {
+    // Guard the interval: with zero roles (a cleared admin field) a naive
+    // modulo would set state to NaN and render nothing.
+    if (roles.length === 0) return;
     const interval = setInterval(() => setIndex((i) => (i + 1) % roles.length), 3000);
     return () => clearInterval(interval);
-  }, []);
+  }, [roles.length]);
+
+  if (roles.length === 0) return null;
 
   return (
     <div className="relative h-9 md:h-11 overflow-hidden">
@@ -50,21 +58,25 @@ function RoleRotator() {
 }
 
 /* ------------------------------------------------------------------ */
-/* Social links                                                        */
-/* ------------------------------------------------------------------ */
-const socials = [
-  { icon: Github, href: siteConfig.links.github, label: "GitHub" },
-  { icon: Linkedin, href: siteConfig.links.linkedin, label: "LinkedIn" },
-  { icon: Twitter, href: siteConfig.links.twitter, label: "Twitter/X" },
-  { icon: Facebook, href: siteConfig.links.facebook, label: "Facebook" },
-  { icon: Mail, href: `mailto:${siteConfig.links.email}`, label: "Email" },
-];
-
-/* ------------------------------------------------------------------ */
 /* Main Hero                                                            */
 /* ------------------------------------------------------------------ */
-export default function Hero() {
+export default function Hero({ site, links, stats }: HeroProps) {
   const containerRef = useRef<HTMLElement>(null);
+
+  // Built inside the component so the links come from props rather than a
+  // module-level snapshot of the static config.
+  const socials = [
+    { icon: Github, href: links.github, label: "GitHub" },
+    { icon: Linkedin, href: links.linkedin, label: "LinkedIn" },
+    { icon: Twitter, href: links.twitter, label: "Twitter/X" },
+    { icon: Facebook, href: links.facebook, label: "Facebook" },
+    { icon: Mail, href: `mailto:${links.email}`, label: "Email" },
+  ].filter((s) => Boolean(s.href));
+
+  // The first three stats double as the quick badges. Previously these were
+  // hardcoded ("2+ Years", "15+ Projects", "500+ Problems Solved"), which meant
+  // editing a stat in the admin left a stale duplicate claim in the Hero.
+  const badges = stats.slice(0, 3);
 
   return (
     <section
@@ -107,7 +119,7 @@ export default function Hero() {
             >
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <span className="font-mono text-xs tracking-wider text-muted-foreground">
-                Available for work
+                {site.status ?? "Available for work"}
               </span>
             </motion.div>
 
@@ -118,20 +130,28 @@ export default function Hero() {
               transition={{ delay: 0.3, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
               className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[0.9] mb-3"
             >
-              <span className="text-foreground">Ahmed</span>
-              <br />
-              <span className="gold-text">ElGabbas</span>
+              {site.firstName ? (
+                <span className="text-foreground">{site.firstName}</span>
+              ) : (
+                <span className="text-foreground">{site.name}</span>
+              )}
+              {site.firstName && site.lastName ? <br /> : null}
+              {site.lastName ? (
+                <span className="gold-text">{site.lastName}</span>
+              ) : null}
             </motion.h1>
 
             {/* Role rotator */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5, duration: 0.5 }}
-              className="mb-6"
-            >
-              <RoleRotator />
-            </motion.div>
+            {site.roles.length > 0 ? (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5, duration: 0.5 }}
+                className="mb-6"
+              >
+                <RoleRotator roles={site.roles} />
+              </motion.div>
+            ) : null}
 
             {/* Bio */}
             <motion.p
@@ -140,27 +160,30 @@ export default function Hero() {
               transition={{ delay: 0.6, duration: 0.5 }}
               className="text-muted-foreground text-base md:text-lg leading-relaxed max-w-lg mb-6"
             >
-              Engineering production-grade systems — from cross-platform mobile
-              apps to scalable full-stack platforms. Based in Cairo, Egypt
+              {site.headline}
             </motion.p>
 
-            {/* Quick badges */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.7 }}
-              className="flex flex-wrap items-center gap-3 mb-8"
-            >
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border bg-card text-xs font-mono text-muted-foreground">
-                <Briefcase size={12} className="gold-text" /> 2+ Years
-              </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border bg-card text-xs font-mono text-muted-foreground">
-                15+ Projects
-              </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border bg-card text-xs font-mono text-muted-foreground">
-                500+ Problems Solved
-              </span>
-            </motion.div>
+            {/* Quick badges, sourced from the stats rows */}
+            {badges.length > 0 ? (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.7 }}
+                className="flex flex-wrap items-center gap-3 mb-8"
+              >
+                {badges.map((stat, i) => (
+                  <span
+                    key={stat.id}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border bg-card text-xs font-mono text-muted-foreground"
+                  >
+                    {i === 0 ? (
+                      <Briefcase size={12} className="gold-text shrink-0" />
+                    ) : null}
+                    {stat.value} {stat.label}
+                  </span>
+                ))}
+              </motion.div>
+            ) : null}
 
             {/* CTA Buttons */}
             <motion.div
@@ -187,71 +210,76 @@ export default function Hero() {
               >
                 View Work
               </a>
-              <a
-                href="/assets/Ahmed-Mahmoud-Ahmed-Elgabbas-FlowCV-Resume-20241202.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                className={cn(
-                  buttonVariants({ variant: "outline" }),
-                  "rounded-full px-7 py-3 border-primary/40 text-accent font-mono text-xs tracking-wider uppercase h-auto inline-flex items-center hover:bg-primary/10"
-                )}
-              >
-                <Download size={14} className="mr-2" /> Download CV
-              </a>
+              {site.resumeUrl ? (
+                <a
+                  href={site.resumeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={cn(
+                    buttonVariants({ variant: "outline" }),
+                    "rounded-full px-7 py-3 border-primary/40 text-accent font-mono text-xs tracking-wider uppercase h-auto inline-flex items-center hover:bg-primary/10"
+                  )}
+                >
+                  <Download size={14} className="mr-2" /> Download CV
+                </a>
+              ) : null}
             </motion.div>
 
             {/* Social links */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1, duration: 0.5 }}
-              className="flex items-center gap-2"
-            >
-              {socials.map((s) => (
-                <a
-                  key={s.label}
-                  href={s.href}
-                  target={s.href.startsWith("mailto") ? undefined : "_blank"}
-                  rel={s.href.startsWith("mailto") ? undefined : "noopener noreferrer"}
-                  aria-label={s.label}
-                  className="w-10 h-10 rounded-xl flex items-center justify-center border border-border bg-card text-muted-foreground hover:text-foreground hover:border-primary/30 hover:gold-glow-sm transition-all duration-200"
-                >
-                  <s.icon size={16} />
-                </a>
-              ))}
-            </motion.div>
+            {socials.length > 0 ? (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1, duration: 0.5 }}
+                className="flex items-center gap-2"
+              >
+                {socials.map((s) => (
+                  <a
+                    key={s.label}
+                    href={s.href}
+                    target={s.href.startsWith("mailto") ? undefined : "_blank"}
+                    rel={s.href.startsWith("mailto") ? undefined : "noopener noreferrer"}
+                    aria-label={s.label}
+                    className="w-10 h-10 rounded-xl flex items-center justify-center border border-border bg-card text-muted-foreground hover:text-foreground hover:border-primary/30 hover:gold-glow-sm transition-all duration-200"
+                  >
+                    <s.icon size={16} />
+                  </a>
+                ))}
+              </motion.div>
+            ) : null}
           </motion.div>
 
           {/* Right — Profile photo */}
-          <div className="relative flex items-center justify-center">
-            <ProfileFrame
-              imageSrc={personalInfo.photo}
-              imageAlt={`${personalInfo.name} — ${personalInfo.title}`}
-              name=""
-              label=""
-            />
-          </div>
+          {site.photoUrl ? (
+            <div className="relative flex items-center justify-center">
+              <ProfileFrame
+                imageSrc={site.photoUrl}
+                imageAlt={`${site.name} — ${site.title}`}
+                name=""
+                label=""
+              />
+            </div>
+          ) : null}
         </div>
 
         {/* Stats strip */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.2, duration: 0.6 }}
-          className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-4"
-        >
-          {stats.map((stat) => (
-            <div
-              key={stat.label}
-              className="glass-card p-5 text-center"
-            >
-              <div className="font-display text-3xl md:text-4xl font-bold gold-text">{stat.value}</div>
-              <div className="font-mono text-[10px] tracking-[0.2em] uppercase text-muted-foreground mt-2">
-                {stat.label}
+        {stats.length > 0 ? (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.2, duration: 0.6 }}
+            className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-4"
+          >
+            {stats.map((stat) => (
+              <div key={stat.id} className="glass-card p-5 text-center">
+                <div className="font-display text-3xl md:text-4xl font-bold gold-text">{stat.value}</div>
+                <div className="font-mono text-[10px] tracking-[0.2em] uppercase text-muted-foreground mt-2">
+                  {stat.label}
+                </div>
               </div>
-            </div>
-          ))}
-        </motion.div>
+            ))}
+          </motion.div>
+        ) : null}
 
         {/* Scroll indicator */}
         <motion.div

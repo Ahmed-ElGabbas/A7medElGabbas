@@ -17,10 +17,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { projects } from "@/constants/projects";
-import { siteConfig } from "@/config/site";
-
-const categories = ["All", "Mobile", "Full-Stack", "Backend", "Frontend"];
+import type {
+  Project,
+  ResolvedSectionMeta,
+  SocialLinks,
+} from "@/lib/content";
 
 const categoryIcons: Record<string, React.ElementType> = {
   Mobile: Smartphone,
@@ -29,13 +30,27 @@ const categoryIcons: Record<string, React.ElementType> = {
   Frontend: Code2,
 };
 
-export default function Projects() {
-  const [activeFilter, setActiveFilter] = useState("All");
+const ALL = "All";
+
+interface ProjectsProps {
+  projects: Project[];
+  categories: string[];
+  links: SocialLinks;
+  heading: ResolvedSectionMeta;
+}
+
+export default function Projects({ projects, categories, links, heading }: ProjectsProps) {
+  const [activeFilter, setActiveFilter] = useState(ALL);
+
+  // An admin can rename or delete the category of the currently selected tab,
+  // which would otherwise leave the grid empty with no way back to "All".
+  const filters = [ALL, ...categories];
+  const effectiveFilter = filters.includes(activeFilter) ? activeFilter : ALL;
 
   const filteredProjects =
-    activeFilter === "All"
+    effectiveFilter === ALL
       ? projects
-      : projects.filter((p) => p.category === activeFilter);
+      : projects.filter((p) => p.category === effectiveFilter);
 
   return (
     <section
@@ -46,21 +61,22 @@ export default function Projects() {
       <div className="absolute top-1/4 right-0 w-80 h-80 rounded-full bg-primary/5 blur-3xl pointer-events-none" />
 
       <SectionHeading
-        index="04"
-        label="PORTFOLIO"
-        title="Featured Projects"
-        subtitle="A curated showcase of cross-platform mobile apps, reactive web platforms, and robust APIs."
+        index={heading.index}
+        label={heading.label}
+        title={heading.title}
+        subtitle={heading.subtitle ?? ""}
       />
 
       {/* Filter Tabs */}
       <div className="mt-10 flex flex-wrap items-center justify-start sm:justify-center gap-2">
-        {categories.map((cat) => (
+        {filters.map((cat) => (
           <button
             key={cat}
             onClick={() => setActiveFilter(cat)}
+            aria-pressed={effectiveFilter === cat}
             className={cn(
               "px-4 py-2 rounded-full text-xs font-mono uppercase tracking-wider transition-all duration-200 border cursor-pointer select-none",
-              activeFilter === cat
+              effectiveFilter === cat
                 ? "bg-primary text-primary-foreground border-primary shadow-sm shadow-primary/30 font-semibold"
                 : "bg-card border-border/70 text-muted-foreground hover:text-foreground hover:border-primary/40 hover:bg-card/80"
             )}
@@ -80,7 +96,7 @@ export default function Projects() {
             const CatIcon = categoryIcons[project.category] || Layers;
             return (
               <motion.div
-                key={project.title}
+                key={project.id}
                 layout
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -141,7 +157,7 @@ export default function Projects() {
 
                       <div className="flex items-center gap-3 pt-1">
                         <a
-                          href={siteConfig.links.github}
+                          href={links.github}
                           target="_blank"
                           rel="noopener noreferrer"
                           className={cn(
@@ -155,7 +171,7 @@ export default function Projects() {
                           href="#contact"
                           className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1"
                         >
-                          Discuss project →
+                          Discuss project â†’
                         </a>
                       </div>
                     </div>
@@ -190,7 +206,7 @@ export default function Projects() {
         </div>
 
         <a
-          href={siteConfig.links.github}
+          href={links.github}
           target="_blank"
           rel="noopener noreferrer"
           className={cn(

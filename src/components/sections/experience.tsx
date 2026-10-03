@@ -13,9 +13,26 @@ import { SectionHeading } from "@/components/ui/section-heading";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { experiences, education, futureGoals } from "@/data/portfolio";
+import type {
+  Education,
+  Experience as ExperienceEntry,
+  FutureGoals,
+  ResolvedSectionMeta,
+} from "@/lib/content";
 
-export default function Experience() {
+interface ExperienceProps {
+  experiences: ExperienceEntry[];
+  education: Education[];
+  futureGoals: FutureGoals | null;
+  heading: ResolvedSectionMeta;
+}
+
+export default function Experience({
+  experiences,
+  education,
+  futureGoals,
+  heading,
+}: ExperienceProps) {
   return (
     <section
       id="experience"
@@ -25,10 +42,10 @@ export default function Experience() {
       <div className="absolute top-1/2 left-0 w-80 h-80 rounded-full bg-primary/5 blur-3xl pointer-events-none" />
 
       <SectionHeading
-        index="03"
-        label="CAREER"
-        title="Experience & Education"
-        subtitle="Chronological track of engineering projects, specialized development tracks, and academic foundations."
+        index={heading.index}
+        label={heading.label}
+        title={heading.title}
+        subtitle={heading.subtitle ?? undefined}
       />
 
       <div className="mt-14 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14">
@@ -46,7 +63,7 @@ export default function Experience() {
           <div className="relative pl-6 sm:pl-8 border-l-2 border-primary/20 space-y-10 ml-3 sm:ml-4">
             {experiences.map((exp, index) => (
               <motion.div
-                key={exp.role + index}
+                key={exp.id}
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, margin: "-80px" }}
@@ -110,9 +127,9 @@ export default function Experience() {
               </h3>
             </div>
 
-            {education.map((edu, idx) => (
+            {education.map((edu) => (
               <motion.div
-                key={idx}
+                key={edu.id}
                 initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -144,28 +161,25 @@ export default function Experience() {
                       {edu.description}
                     </p>
 
-                    <div className="pt-3 border-t border-border/40 space-y-2">
-                      <div className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground">
-                        Key Studies
+                    {/* Rendered from edu.courses rather than a literal list, so
+                        courses edited in the admin actually appear here. */}
+                    {edu.courses.length > 0 ? (
+                      <div className="pt-3 border-t border-border/40 space-y-2">
+                        <div className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground">
+                          Key Studies
+                        </div>
+                        <div className="flex flex-wrap gap-1.5">
+                          {edu.courses.map((course) => (
+                            <span
+                              key={course}
+                              className="px-2 py-0.5 rounded text-[10px] font-mono bg-muted/60 text-muted-foreground border border-border/40"
+                            >
+                              {course}
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                      <div className="flex flex-wrap gap-1.5">
-                        {[
-                          "Robotics Software",
-                          "Algorithms & Data Structures",
-                          "Distributed Systems",
-                          "Computer Vision",
-                          "Object-Oriented Design",
-                          "Database Architectures",
-                        ].map((course) => (
-                          <span
-                            key={course}
-                            className="px-2 py-0.5 rounded text-[10px] font-mono bg-muted/60 text-muted-foreground border border-border/40"
-                          >
-                            {course}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
+                    ) : null}
                   </CardContent>
                 </Card>
               </motion.div>
@@ -175,38 +189,44 @@ export default function Experience() {
           <Separator className="bg-border/60" />
 
           {/* Future Aspirations Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-          >
-            <Card className="border-primary/30 bg-primary/[0.02] p-6 shadow-sm">
-              <CardContent className="p-0 space-y-3">
-                <div className="flex items-center gap-2 text-primary text-xs font-mono uppercase tracking-wider">
-                  <Rocket size={15} /> Next Frontiers & Focus
-                </div>
-                <h4 className="text-base font-bold text-foreground">
-                  {futureGoals.title}
-                </h4>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  {futureGoals.description}
-                </p>
+          {futureGoals ? (
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+            >
+              <Card className="border-primary/30 bg-primary/[0.02] p-6 shadow-sm">
+                <CardContent className="p-0 space-y-3">
+                  <div className="flex items-center gap-2 text-primary text-xs font-mono uppercase tracking-wider">
+                    <Rocket size={15} /> Next Frontiers & Focus
+                  </div>
+                  <h4 className="text-base font-bold text-foreground">
+                    {futureGoals.title}
+                  </h4>
+                  {futureGoals.description ? (
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      {futureGoals.description}
+                    </p>
+                  ) : null}
 
-                <div className="pt-2 space-y-1.5">
-                  {futureGoals.items.map((goal, gIdx) => (
-                    <div
-                      key={gIdx}
-                      className="flex items-center gap-2 text-xs text-foreground/80 font-medium"
-                    >
-                      <CheckCircle2 size={13} className="text-primary shrink-0" />
-                      <span>{goal}</span>
+                  {futureGoals.items.length > 0 ? (
+                    <div className="pt-2 space-y-1.5">
+                      {futureGoals.items.map((goal, gIdx) => (
+                        <div
+                          key={gIdx}
+                          className="flex items-center gap-2 text-xs text-foreground/80 font-medium"
+                        >
+                          <CheckCircle2 size={13} className="text-primary shrink-0" />
+                          <span>{goal}</span>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
+                  ) : null}
+                </CardContent>
+              </Card>
+            </motion.div>
+          ) : null}
         </div>
       </div>
     </section>

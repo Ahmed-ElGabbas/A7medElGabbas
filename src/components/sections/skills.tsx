@@ -3,12 +3,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Code,
-  Layout,
-  Smartphone,
-  Server,
-  Database,
-  Wrench,
   Check,
   Workflow,
   ShieldCheck,
@@ -18,27 +12,59 @@ import { SectionHeading } from "@/components/ui/section-heading";
 import { Badge } from "@/components/ui/badge";
 import { Ticker } from "@/components/ui/ticker";
 import { cn } from "@/lib/utils";
-import { skillCategories, skillSpotlights, philosophyQuote } from "@/data/portfolio";
+import { resolveSkillCategoryIcon } from "@/lib/content-icons";
+import type {
+  PhilosophyQuote,
+  ResolvedSectionMeta,
+  SkillCategory,
+  TickerSkill,
+} from "@/lib/content";
 
-const categoryIconMap: Record<string, React.ElementType> = {
-  code: Code,
-  layout: Layout,
-  smartphone: Smartphone,
-  server: Server,
-  database: Database,
-  wrench: Wrench,
+interface SkillsProps {
+  categories: SkillCategory[];
+  tickerSkills: TickerSkill[];
+  philosophyQuote: PhilosophyQuote | null;
+  heading: ResolvedSectionMeta;
+}
+
+/**
+ * Used when a category has no spotlight row, so an admin who deletes one gets
+ * sensible copy instead of an empty right-hand panel.
+ */
+const FALLBACK_SPOTLIGHT = {
+  summary:
+    "Professional technical expertise refined through production and open-source applications.",
+  patterns: ["Best Practices", "Clean Architecture", "Modular Design", "Robust Testing"],
+  primaryProject: "Production Systems",
 };
 
-const categoryDescriptions = skillSpotlights;
-
-export default function Skills() {
+export default function Skills({
+  categories,
+  tickerSkills,
+  philosophyQuote,
+  heading,
+}: SkillsProps) {
   const [activeTab, setActiveTab] = useState(0);
-  const currentCategory = skillCategories[activeTab] || skillCategories[0];
-  const currentMetadata = categoryDescriptions[currentCategory.title] || {
-    summary: "Professional technical expertise refined through production and open-source applications.",
-    patterns: ["Best Practices", "Clean Architecture", "Modular Design", "Robust Testing"],
-    primaryProject: "Production Systems",
-  };
+
+  // Guard against the admin deleting the category that was selected, or
+  // reordering the list out from under the active index.
+  const safeIndex = categories.length === 0 ? -1 : Math.min(activeTab, categories.length - 1);
+  const currentCategory = safeIndex >= 0 ? categories[safeIndex] : null;
+
+  if (!currentCategory) {
+    return (
+      <section id="skills" className="relative py-24 sm:py-32 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <SectionHeading
+          index={heading.index}
+          label={heading.label}
+          title={heading.title}
+          subtitle={heading.subtitle ?? undefined}
+        />
+      </section>
+    );
+  }
+
+  const spotlight = currentCategory.spotlight ?? FALLBACK_SPOTLIGHT;
 
   return (
     <section
@@ -49,20 +75,20 @@ export default function Skills() {
       <div className="absolute top-1/3 right-0 w-96 h-96 rounded-full bg-primary/5 blur-3xl pointer-events-none" />
 
       <SectionHeading
-        index="02"
-        label="EXPERTISE"
-        title="Technical Stack"
-        subtitle="Tools, languages, and frameworks I leverage to engineer performant, reliable software."
+        index={heading.index}
+        label={heading.label}
+        title={heading.title}
+        subtitle={heading.subtitle ?? undefined}
       />
 
       {/* Category selector tabs */}
       <div className="mt-12 flex flex-wrap gap-2 sm:gap-3 justify-start sm:justify-center">
-        {skillCategories.map((cat, idx) => {
-          const Icon = categoryIconMap[cat.icon] || Code;
-          const isActive = idx === activeTab;
+        {categories.map((cat, idx) => {
+          const CatIcon = resolveSkillCategoryIcon(cat.icon);
+          const isActive = idx === safeIndex;
           return (
             <button
-              key={cat.title}
+              key={cat.id}
               onClick={() => setActiveTab(idx)}
               className={cn(
                 "flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 border cursor-pointer select-none",
@@ -71,7 +97,7 @@ export default function Skills() {
                   : "bg-card border-border/70 text-muted-foreground hover:text-foreground hover:border-primary/40 hover:bg-card/80"
               )}
             >
-              <Icon size={14} className={isActive ? "text-primary-foreground" : "text-primary"} />
+              <CatIcon size={14} className={isActive ? "text-primary-foreground" : "text-primary"} />
               <span>{cat.title}</span>
             </button>
           );
@@ -84,7 +110,7 @@ export default function Skills() {
         <div className="lg:col-span-7">
           <AnimatePresence mode="wait">
             <motion.div
-              key={currentCategory.title}
+              key={currentCategory.id}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
@@ -102,7 +128,7 @@ export default function Skills() {
                     </p>
                   </div>
                   <Badge variant="outline" className="border-primary/40 text-primary bg-primary/5 font-mono text-[11px]">
-                    Category {activeTab + 1} of {skillCategories.length}
+                    Category {safeIndex + 1} of {categories.length}
                   </Badge>
                 </div>
 
@@ -110,11 +136,11 @@ export default function Skills() {
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {currentCategory.skills.map((skill) => (
                     <div
-                      key={skill}
+                      key={skill.id}
                       className="group flex items-center justify-between p-3 rounded-xl bg-background/60 border border-border/50 hover:border-primary/50 hover:bg-background transition-all duration-200"
                     >
                       <span className="text-xs sm:text-sm font-medium text-foreground group-hover:text-primary transition-colors">
-                        {skill}
+                        {skill.name}
                       </span>
                       <Check
                         size={14}
@@ -138,7 +164,7 @@ export default function Skills() {
         <div className="lg:col-span-5">
           <AnimatePresence mode="wait">
             <motion.div
-              key={currentCategory.title + "-details"}
+              key={`${currentCategory.id}-details`}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
@@ -153,60 +179,70 @@ export default function Skills() {
                   How I apply this layer
                 </h4>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  {currentMetadata.summary}
+                  {spotlight.summary}
                 </p>
 
                 {/* Key architectural patterns */}
-                <div className="mt-6 space-y-2.5">
-                  <span className="text-xs font-mono uppercase tracking-wider text-foreground/80 block">
-                    Core Design Patterns:
-                  </span>
-                  {currentMetadata.patterns.map((pattern, pIdx) => (
-                    <div
-                      key={pIdx}
-                      className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground"
-                    >
-                      <ShieldCheck size={14} className="text-primary shrink-0" />
-                      <span>{pattern}</span>
-                    </div>
-                  ))}
-                </div>
+                {spotlight.patterns.length > 0 ? (
+                  <div className="mt-6 space-y-2.5">
+                    <span className="text-xs font-mono uppercase tracking-wider text-foreground/80 block">
+                      Core Design Patterns:
+                    </span>
+                    {spotlight.patterns.map((pattern, pIdx) => (
+                      <div
+                        key={pIdx}
+                        className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground"
+                      >
+                        <ShieldCheck size={14} className="text-primary shrink-0" />
+                        <span>{pattern}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
               </div>
 
               {/* Primary Application Showcase */}
-              <div className="pt-4 border-t border-border/40">
-                <span className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground block mb-1">
-                  Representative Artifact
-                </span>
-                <span className="text-xs sm:text-sm font-semibold text-foreground">
-                  {currentMetadata.primaryProject}
-                </span>
-              </div>
+              {spotlight.primaryProject ? (
+                <div className="pt-4 border-t border-border/40">
+                  <span className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground block mb-1">
+                    Representative Artifact
+                  </span>
+                  <span className="text-xs sm:text-sm font-semibold text-foreground">
+                    {spotlight.primaryProject}
+                  </span>
+                </div>
+              ) : null}
             </motion.div>
           </AnimatePresence>
         </div>
       </div>
 
       {/* Scrolling tech marquee */}
-      <div className="mt-12">
-        <Ticker />
-      </div>
+      {tickerSkills.length > 0 ? (
+        <div className="mt-12">
+          <Ticker items={tickerSkills} />
+        </div>
+      ) : null}
 
       {/* Engineering Philosophy Quote */}
-      <motion.div
-        initial={{ opacity: 0, y: 15 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5 }}
-        className="mt-8 p-6 sm:p-8 rounded-2xl border border-primary/20 bg-primary/[0.02] text-center max-w-3xl mx-auto"
-      >
-        <blockquote className="text-sm sm:text-base italic text-foreground/90 font-serif leading-relaxed">
-          &ldquo;{philosophyQuote.quote}&rdquo;
-        </blockquote>
-        <div className="mt-3 text-xs font-mono uppercase tracking-widest text-primary">
-          — {philosophyQuote.author}
-        </div>
-      </motion.div>
+      {philosophyQuote?.quote ? (
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="mt-8 p-6 sm:p-8 rounded-2xl border border-primary/20 bg-primary/[0.02] text-center max-w-3xl mx-auto"
+        >
+          <blockquote className="text-sm sm:text-base italic text-foreground/90 font-serif leading-relaxed">
+            &ldquo;{philosophyQuote.quote}&rdquo;
+          </blockquote>
+          {philosophyQuote.author ? (
+            <div className="mt-3 text-xs font-mono uppercase tracking-widest text-primary">
+              — {philosophyQuote.author}
+            </div>
+          ) : null}
+        </motion.div>
+      ) : null}
     </section>
   );
 }

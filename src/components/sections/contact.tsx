@@ -23,9 +23,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { siteConfig } from "@/config/site";
+import type { ResolvedSectionMeta, SiteConfig, SocialLinks } from "@/lib/content";
 
-export default function Contact() {
+interface ContactProps {
+  site: SiteConfig;
+  links: SocialLinks;
+  heading: ResolvedSectionMeta;
+}
+
+export default function Contact({ site, links, heading }: ContactProps) {
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [formStatus, setFormStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -39,7 +45,7 @@ export default function Contact() {
   });
 
   const handleCopyEmail = () => {
-    navigator.clipboard.writeText(siteConfig.links.email);
+    navigator.clipboard.writeText(links.email);
     setCopiedEmail(true);
     setTimeout(() => setCopiedEmail(false), 2500);
   };
@@ -81,10 +87,10 @@ export default function Contact() {
       <div className="absolute bottom-0 left-0 w-80 h-80 rounded-full bg-primary/4 blur-3xl pointer-events-none" />
 
       <SectionHeading
-        index="06"
-        label="CONNECT"
-        title="Let's Build Together"
-        subtitle="Have a project in mind, an opportunity to discuss, or just want to say hello? My inbox is always open."
+        index={heading.index}
+        label={heading.label}
+        title={heading.title}
+        subtitle={heading.subtitle ?? ""}
       />
 
       <div className="mt-14 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
@@ -104,12 +110,14 @@ export default function Contact() {
                 <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500" />
               </span>
               <span className="text-xs font-mono font-semibold uppercase tracking-wider text-emerald-500">
-                Available For Hire
+                {site.status ?? "Available For Hire"}
               </span>
             </div>
-            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-              Accepting software development internships, freelance contracts, and full-time inquiries for 2025/2026.
-            </p>
+            {site.statusSubtext && (
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                {site.statusSubtext}
+              </p>
+            )}
           </div>
 
           {/* Contact Direct Channels */}
@@ -126,10 +134,10 @@ export default function Contact() {
                       Email Address
                     </div>
                     <a
-                      href={`mailto:${siteConfig.links.email}`}
+                      href={`mailto:${links.email}`}
                       className="text-xs sm:text-sm font-semibold text-foreground hover:text-primary transition-colors truncate block"
                     >
-                      {siteConfig.links.email}
+                      {links.email}
                     </a>
                   </div>
                 </div>
@@ -160,10 +168,10 @@ export default function Contact() {
                     Phone / WhatsApp
                   </div>
                   <a
-                    href={`tel:${siteConfig.links.phone}`}
+                    href={`tel:${links.phone}`}
                     className="text-xs sm:text-sm font-semibold text-foreground hover:text-primary transition-colors font-mono"
                   >
-                    {siteConfig.links.phone}
+                    {links.phone}
                   </a>
                 </div>
               </CardContent>
@@ -180,7 +188,7 @@ export default function Contact() {
                     Location
                   </div>
                   <div className="text-xs sm:text-sm font-semibold text-foreground">
-                    Cairo, Egypt
+                    {site.location ?? "Cairo, Egypt"}
                   </div>
                 </div>
               </CardContent>
@@ -190,10 +198,10 @@ export default function Contact() {
           {/* Social Links Row */}
           <div className="pt-2 flex items-center gap-2">
             {[
-              { icon: Github, href: siteConfig.links.github, label: "GitHub" },
-              { icon: Linkedin, href: siteConfig.links.linkedin, label: "LinkedIn" },
-              { icon: Twitter, href: siteConfig.links.twitter, label: "Twitter" },
-              { icon: Facebook, href: siteConfig.links.facebook, label: "Facebook" },
+              { icon: Github, href: links.github, label: "GitHub" },
+              { icon: Linkedin, href: links.linkedin, label: "LinkedIn" },
+              { icon: Twitter, href: links.twitter, label: "Twitter" },
+              { icon: Facebook, href: links.facebook, label: "Facebook" },
             ].map(({ icon: Icon, href, label }) => (
               <a
                 key={label}
@@ -239,7 +247,7 @@ export default function Contact() {
                 </div>
                 <h4 className="text-lg font-bold text-foreground">Message Dispatched!</h4>
                 <p className="text-xs sm:text-sm text-muted-foreground max-w-sm mx-auto">
-                  Thank you for reaching out, Ahmed will get back to you shortly.
+                  Thank you for reaching out, {site.firstName ?? "I"} will get back to you shortly.
                 </p>
               </div>
             ) : (

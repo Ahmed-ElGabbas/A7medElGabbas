@@ -4,12 +4,23 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Sun, Moon, Github, Linkedin, Mail, Rocket } from "lucide-react";
 import Image from "next/image";
-import { navItems } from "@/config/site";
 import { useScrollspy } from "@/hooks/use-scrollspy";
 import { useScrollProgress } from "@/hooks/use-scroll-progress";
 import { Button } from "@/components/ui/button";
+import type { SocialLinks } from "@/lib/content";
 
 type Theme = "dark" | "light";
+
+export interface NavLink {
+  label: string;
+  href: string;
+}
+
+interface HeaderProps {
+  navItems: NavLink[];
+  links: SocialLinks;
+  siteName: string;
+}
 
 const THEME_KEY = "theme";
 const DEFAULT_THEME: Theme = "dark";
@@ -29,7 +40,7 @@ function subscribeTheme(callback: () => void) {
   return () => window.removeEventListener("storage", callback);
 }
 
-export default function Header() {
+export default function Header({ navItems, links, siteName }: HeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const toggleRef = useRef<HTMLButtonElement>(null);
@@ -159,7 +170,7 @@ export default function Header() {
               />
             </div>
             <span className="font-display font-bold text-lg md:text-xl leading-none text-foreground">
-              Ahmed<span className="gold-text">ElGabbas</span>
+              {siteName}
             </span>
           </a>
 
@@ -265,10 +276,28 @@ export default function Header() {
               );
             })}
             <div className="absolute bottom-8 left-10 right-10 flex items-center justify-between">
+              {/* Sourced from socialLinks rather than hardcoded: these three
+                  URLs were previously literals that silently went stale when the
+                  admin changed a profile link. */}
               <div className="flex items-center gap-3">
-                <a href="https://github.com/Elagbbas" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors"><Github size={18} /></a>
-                <a href="https://www.linkedin.com/in/ahmed-elgabbas-33a186344" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors"><Linkedin size={18} /></a>
-                <a href="mailto:ahmedelgabbas769@gmail.com" className="text-muted-foreground hover:text-foreground transition-colors"><Mail size={18} /></a>
+                {[
+                  { icon: Github, href: links.github, label: "GitHub" },
+                  { icon: Linkedin, href: links.linkedin, label: "LinkedIn" },
+                  { icon: Mail, href: `mailto:${links.email}`, label: "Email" },
+                ]
+                  .filter((s) => Boolean(s.href))
+                  .map(({ icon: Icon, href, label }) => (
+                    <a
+                      key={label}
+                      href={href}
+                      target={href.startsWith("mailto") ? undefined : "_blank"}
+                      rel={href.startsWith("mailto") ? undefined : "noopener noreferrer"}
+                      aria-label={label}
+                      className="text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <Icon size={18} />
+                    </a>
+                  ))}
               </div>
               <Button variant="outline" onClick={() => scrollToSection("#contact")} className="rounded-full border-primary/40 gold-text text-xs">Resume</Button>
             </div>
