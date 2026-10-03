@@ -68,24 +68,33 @@ export class SiteConfigService {
     return { items: rows };
   }
 
-  async getSectionMetaItem(id: string) {
+  /**
+   * `key` is the stable identifier for a section heading ("about", "skills").
+   * The numeric `id` is deliberately not used for lookup: it is autoincrementing
+   * and differs between a fresh seed and one that has had rows deleted.
+   */
+  async getSectionMetaItem(key: string) {
     const row = await this.prisma.sectionMeta.findUnique({
-      where: { key: id },
+      where: { key },
     });
 
     if (!row) {
-      throw new NotFoundException(`Section "${id}" not found`);
+      throw new NotFoundException(`Section "${key}" not found`);
     }
 
     return row;
   }
 
+  /**
+   * Upsert rather than a bare update so a heading missing from an unseeded or
+   * partially seeded database can be created from the admin without a migration.
+   */
   async upsertSectionMeta(dto: UpsertSectionMetaDto) {
-    const { id, ...rest } = dto;
+    const { id: key, ...rest } = dto;
 
     return this.prisma.sectionMeta.upsert({
-      where: { key: id },
-      create: { key: id, ...rest, order: rest.order ?? 0 },
+      where: { key },
+      create: { key, ...rest, order: rest.order ?? 0 },
       update: rest,
     });
   }

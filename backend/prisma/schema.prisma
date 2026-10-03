@@ -86,7 +86,10 @@ model SocialLinks {
 /// About, Skills, Experience, Projects, Certificates, Contact. Previously
 /// literals inside each section component.
 model SectionMeta {
-  id       Int     @id @default(1)
+  /// Autoincrementing, NOT `@default(1)`: this is a collection (one row per
+  /// section heading), so a constant default made every insert after the first
+  /// fail with P2002 on the primary key. Rows are addressed by `key`.
+  id       Int     @id @default(autoincrement())
   /// Stable machine key the frontend uses to look up this row, e.g. "projects".
   key      String  @unique
   /// Display index shown in the section heading, e.g. "04".
