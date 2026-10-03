@@ -1,10 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import {
-  CreateNavItemDto,
-  ReorderNavItemsDto,
-  UpdateNavItemDto,
-} from './dto/nav.dto';
+import { CreateNavItemDto, UpdateNavItemDto } from './dto/nav.dto';
+import { ReorderIdsDto } from '../common/dto/reorder.dto';
+import { applyReorder } from '../common/reorder';
 
 @Injectable()
 export class NavService {
@@ -40,26 +38,18 @@ export class NavService {
     return this.prisma.navItem.delete({ where: { id } });
   }
 
-  async reorder(dto: ReorderNavItemsDto) {
-    const startOrder = dto.startOrder ?? 0;
-
+  async reorder(dto: ReorderIdsDto) {
     const existing = await this.prisma.navItem.findMany({
       select: { id: true },
     });
-    const existingIds = new Set(existing.map((row) => row.id));
 
-    const unknown = dto.ids.filter((id) => !existingIds.has(id));
-    if (unknown.length > 0) {
-      throw new BadRequestException(`Unknown nav item ids: ${unknown.join(', ')}`);
-    }
-
-    await this.prisma.$transaction(
-      dto.ids.map((id, index) =>
-        this.prisma.navItem.update({
-          where: { id },
-          data: { order: startOrder + index },
-        }),
-      ),
+    await applyReorder(
+      this.prisma,
+      dto.ids,
+      existing.map((row) => row.id),
+      'nav item',
+      (id, order) => this.prisma.navItem.update({ where: { id }, data: { order } }),
+      dto.startOrder ?? 0,
     );
 
     return this.findAll();

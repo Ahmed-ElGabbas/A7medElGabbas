@@ -1,6 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateProjectDto, ReorderProjectsDto, UpdateProjectDto } from './dto/project.dto';
+import { applyReorder } from '../common/reorder';
+import { CreateProjectDto, UpdateProjectDto } from './dto/project.dto';
+import { ReorderIdsDto } from '../common/dto/reorder.dto';
 
 @Injectable()
 export class ProjectsService {
@@ -50,28 +52,16 @@ export class ProjectsService {
     return this.prisma.project.delete({ where: { id } });
   }
 
-  async reorder(dto: ReorderProjectsDto) {
-    const startOrder = dto.startOrder ?? 0;
-
+  async reorder(dto: ReorderIdsDto) {
     const existing = await this.prisma.project.findMany({ select: { id: true } });
-    const existingIds = new Set(existing.map((row) => row.id));
 
-    const unknown = dto.ids.filter((id) => !existingIds.has(id));
-    if (unknown.length > 0) {
-      throw new BadRequestException(`Unknown project ids: ${unknown.join(', ')}`);
-    }
-
-    if (new Set(dto.ids).size !== dto.ids.length) {
-      throw new BadRequestException('ids must not contain duplicates');
-    }
-
-    await this.prisma.$transaction(
-      dto.ids.map((id, index) =>
-        this.prisma.project.update({
-          where: { id },
-          data: { order: startOrder + index },
-        }),
-      ),
+    await applyReorder(
+      this.prisma,
+      dto.ids,
+      existing.map((row) => row.id),
+      'project',
+      (id, order) => this.prisma.project.update({ where: { id }, data: { order } }),
+      dto.startOrder ?? 0,
     );
 
     return this.findAll();

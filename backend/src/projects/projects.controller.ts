@@ -10,8 +10,9 @@ import {
   Post,
 } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
-import { CreateProjectDto, ReorderProjectsDto, UpdateProjectDto } from './dto/project.dto';
+import { CreateProjectDto, UpdateProjectDto } from './dto/project.dto';
 import { Public } from '../common/public.decorator';
+import { ReorderIdsDto } from '../common/dto/reorder.dto';
 
 @Controller('projects')
 export class ProjectsController {
@@ -42,7 +43,7 @@ export class ProjectsController {
   }
 
   @Patch('reorder')
-  reorder(@Body() dto: ReorderProjectsDto) {
+  reorder(@Body() dto: ReorderIdsDto) {
     return this.projectsService.reorder(dto);
   }
 

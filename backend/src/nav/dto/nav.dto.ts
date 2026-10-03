@@ -1,7 +1,4 @@
-import { Type } from 'class-transformer';
 import {
-  IsArray,
-  IsInt,
   IsOptional,
   IsString,
   Matches,
@@ -39,16 +36,4 @@ export class UpdateNavItemDto {
     message: 'href must be an anchor (#about) or a path (/about)',
   })
   href?: string;
-}
-
-export class ReorderNavItemsDto {
-  @IsArray()
-  @IsString({ each: true })
-  @MaxLength(64, { each: true })
-  ids!: string[];
-
-  @IsOptional()
-  @IsInt()
-  @Type(() => Number)
-  startOrder?: number;
 }

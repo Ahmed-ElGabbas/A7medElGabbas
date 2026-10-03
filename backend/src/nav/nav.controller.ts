@@ -10,12 +10,9 @@ import {
   Post,
 } from '@nestjs/common';
 import { NavService } from './nav.service';
-import {
-  CreateNavItemDto,
-  ReorderNavItemsDto,
-  UpdateNavItemDto,
-} from './dto/nav.dto';
+import { CreateNavItemDto, UpdateNavItemDto } from './dto/nav.dto';
 import { Public } from '../common/public.decorator';
+import { ReorderIdsDto } from '../common/dto/reorder.dto';
 
 @Controller('nav-items')
 export class NavController {
@@ -40,7 +37,7 @@ export class NavController {
   }
 
   @Patch('reorder')
-  reorder(@Body() dto: ReorderNavItemsDto) {
+  reorder(@Body() dto: ReorderIdsDto) {
     return this.navService.reorder(dto);
   }
 

@@ -1,9 +1,8 @@
-import { Transform, Type } from 'class-transformer';
+import { Transform } from 'class-transformer';
 import {
   ArrayMaxSize,
   IsArray,
   IsBoolean,
-  IsInt,
   IsOptional,
   IsString,
   Matches,
@@ -132,15 +131,3 @@ export class UpdateProjectDto {
   demoUrl?: string;
 }
 
-export class ReorderProjectsDto {
-  @IsArray()
-  @IsString({ each: true })
-  @MaxLength(64, { each: true })
-  @ArrayMaxSize(500)
-  ids!: string[];
-
-  @IsOptional()
-  @IsInt()
-  @Type(() => Number)
-  startOrder?: number;
-}
