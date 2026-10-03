@@ -9,14 +9,22 @@ const SECTIONS = [
   { label: "Projects", href: "/admin/projects", state: "Stage 1" },
   { label: "Certificates", href: "/admin/certificates", state: "Stage 1" },
   { label: "Media", href: "/admin/media", state: "Stage 1" },
-  { label: "Contact inbox", href: null, state: "Stage 2" },
+  { label: "Contact inbox", href: "/admin/contact", state: "Stage 2" },
   { label: "Hero & stats", href: null, state: "Stage 3" },
   { label: "About", href: null, state: "Stage 3" },
   { label: "Skills", href: null, state: "Stage 3" },
   { label: "Experience", href: null, state: "Stage 3" },
 ] as const;
 
-export default function AdminDashboardClient() {
+export default function AdminDashboardClient({
+  unreadContacts = 0,
+}: {
+  unreadContacts?: number;
+}) {
+  /** Only the contact inbox has a meaningful unread count to surface. */
+  const badgeFor = (label: string): number | null =>
+    label === "Contact inbox" && unreadContacts > 0 ? unreadContacts : null;
+
   return (
     <div className="mx-auto max-w-5xl px-5 py-16 sm:px-8">
       <div className="mb-10 flex flex-wrap items-start justify-between gap-4">
@@ -56,9 +64,17 @@ export default function AdminDashboardClient() {
 
         <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {SECTIONS.map((section) => {
+            const badge = badgeFor(section.label);
             const body = (
               <>
-                <span className="text-sm">{section.label}</span>
+                <span className="flex items-center gap-2 text-sm">
+                  {section.label}
+                  {badge ? (
+                    <span className="rounded-full border border-accent-gold/40 bg-accent/10 px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-accent-gold">
+                      {badge} unread
+                    </span>
+                  ) : null}
+                </span>
                 <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
                   {section.state}
                 </span>

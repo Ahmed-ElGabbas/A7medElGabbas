@@ -55,6 +55,31 @@ export interface CategoryOption {
   label: string;
 }
 
+export interface AdminContactSubmission {
+  id: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  /** Keyed digest of the submitter's IP, never the address itself. */
+  ipHash: string | null;
+  userAgent: string | null;
+  read: boolean;
+  createdAt: string;
+}
+
+/** Whether email notifications can be sent, surfaced so the inbox can warn. */
+export interface NotificationStatus {
+  configured: boolean;
+  missing: string[];
+}
+
+export interface ContactInbox {
+  items: AdminContactSubmission[];
+  unreadCount: number;
+  notifications: NotificationStatus;
+}
+
 export interface MediaStatus {
   configured: boolean;
   missing: string[];
@@ -142,6 +167,13 @@ export const adminApi = {
   registerMedia: (body: unknown) =>
     apiFetch<AdminMediaAsset>("/media", { method: "POST", body: JSON.stringify(body) }),
   deleteMedia: (id: string) => apiFetch<void>(`/media/${id}`, { method: "DELETE" }),
+
+  contactInbox: () => apiFetch<ContactInbox>("/contact/submissions"),
+  markSubmissionRead: (id: string, read = true) =>
+    apiFetch<AdminContactSubmission>(`/contact/submissions/${id}/read`, {
+      method: "PATCH",
+      body: JSON.stringify({ read }),
+    }),
 };
 
 export interface PresignResult {
