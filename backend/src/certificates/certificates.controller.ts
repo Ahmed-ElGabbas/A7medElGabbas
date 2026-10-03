@@ -12,10 +12,14 @@ import {
 import { CertificatesService } from './certificates.service';
 import {
   CreateCertificateDto,
-  ReorderCertificatesDto,
+  CreateCertificateStatDto,
+  CreateIssuingOrganizationDto,
   UpdateCertificateDto,
+  UpdateCertificateStatDto,
+  UpdateIssuingOrganizationDto,
 } from './dto/certificate.dto';
 import { Public } from '../common/public.decorator';
+import { ReorderIdsDto } from '../common/dto/reorder.dto';
 
 @Controller('certificates')
 export class CertificatesController {
@@ -33,6 +37,74 @@ export class CertificatesController {
     return this.certificatesService.categories();
   }
 
+  /* ------------------------------------------------------------------ */
+  /* certificate_stats — declared before ':id' so the literal segment    */
+  /* is not swallowed by the parameterised route.                        */
+  /* ------------------------------------------------------------------ */
+
+  @Public()
+  @Get('stats')
+  findAllStats() {
+    return this.certificatesService.findAllStats();
+  }
+
+  @Post('stats')
+  @HttpCode(HttpStatus.CREATED)
+  createStat(@Body() dto: CreateCertificateStatDto) {
+    return this.certificatesService.createStat(dto);
+  }
+
+  @Patch('stats/reorder')
+  reorderStats(@Body() dto: ReorderIdsDto) {
+    return this.certificatesService.reorderStats(dto);
+  }
+
+  @Patch('stats/:id')
+  updateStat(@Param('id') id: string, @Body() dto: UpdateCertificateStatDto) {
+    return this.certificatesService.updateStat(id, dto);
+  }
+
+  @Delete('stats/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async removeStat(@Param('id') id: string) {
+    await this.certificatesService.removeStat(id);
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* issuing_organizations                                               */
+  /* ------------------------------------------------------------------ */
+
+  @Public()
+  @Get('issuing-organizations')
+  findAllIssuingOrganizations() {
+    return this.certificatesService.findAllIssuingOrganizations();
+  }
+
+  @Post('issuing-organizations')
+  @HttpCode(HttpStatus.CREATED)
+  createIssuingOrganization(@Body() dto: CreateIssuingOrganizationDto) {
+    return this.certificatesService.createIssuingOrganization(dto);
+  }
+
+  @Patch('issuing-organizations/reorder')
+  reorderIssuingOrganizations(@Body() dto: ReorderIdsDto) {
+    return this.certificatesService.reorderIssuingOrganizations(dto);
+  }
+
+  @Patch('issuing-organizations/:id')
+  updateIssuingOrganization(
+    @Param('id') id: string,
+    @Body() dto: UpdateIssuingOrganizationDto,
+  ) {
+    return this.certificatesService.updateIssuingOrganization(id, dto);
+  }
+
+  @Delete('issuing-organizations/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async removeIssuingOrganization(@Param('id') id: string) {
+    await this.certificatesService.removeIssuingOrganization(id);
+  }
+
   @Public()
   @Get(':id')
   findOne(@Param('id') id: string) {
@@ -46,7 +118,7 @@ export class CertificatesController {
   }
 
   @Patch('reorder')
-  reorder(@Body() dto: ReorderCertificatesDto) {
+  reorder(@Body() dto: ReorderIdsDto) {
     return this.certificatesService.reorder(dto);
   }
 

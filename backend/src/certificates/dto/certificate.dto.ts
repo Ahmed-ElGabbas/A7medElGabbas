@@ -1,10 +1,9 @@
-import { Transform, Type } from 'class-transformer';
+import { Transform } from 'class-transformer';
 import {
   ArrayMaxSize,
   IsArray,
   IsBoolean,
   IsEnum,
-  IsInt,
   IsOptional,
   IsString,
   Matches,
@@ -186,15 +185,70 @@ export class UpdateCertificateDto {
   fileUrl?: string;
 }
 
-export class ReorderCertificatesDto {
-  @IsArray()
-  @IsString({ each: true })
-  @MaxLength(64, { each: true })
-  @ArrayMaxSize(500)
-  ids!: string[];
+
+/* ------------------------------------------------------------------------- */
+/* certificate_stats - the four-metric plaque under the certificates grid     */
+/* ------------------------------------------------------------------------- */
+
+export class CreateCertificateStatDto {
+  @Trim()
+  @IsString()
+  @MinLength(1)
+  @MaxLength(24)
+  value!: string;
+
+  @Trim()
+  @IsString()
+  @MinLength(1)
+  @MaxLength(80)
+  label!: string;
 
   @IsOptional()
-  @IsInt()
-  @Type(() => Number)
-  startOrder?: number;
+  @Trim()
+  @IsString()
+  @MaxLength(120)
+  desc?: string;
+}
+
+export class UpdateCertificateStatDto {
+  @IsOptional()
+  @Trim()
+  @IsString()
+  @MinLength(1)
+  @MaxLength(24)
+  value?: string;
+
+  @IsOptional()
+  @Trim()
+  @IsString()
+  @MinLength(1)
+  @MaxLength(80)
+  label?: string;
+
+  @IsOptional()
+  @Trim()
+  @IsString()
+  @MaxLength(120)
+  desc?: string;
+}
+
+/* ------------------------------------------------------------------------- */
+/* issuing_organizations - the "Accredited Issuers" row                      */
+/* ------------------------------------------------------------------------- */
+
+export class CreateIssuingOrganizationDto {
+  @Trim()
+  @IsString()
+  @MinLength(1)
+  @MaxLength(120)
+  name!: string;
+}
+
+export class UpdateIssuingOrganizationDto {
+  @IsOptional()
+  @Trim()
+  @IsString()
+  @MinLength(1)
+  @MaxLength(120)
+  name?: string;
 }
