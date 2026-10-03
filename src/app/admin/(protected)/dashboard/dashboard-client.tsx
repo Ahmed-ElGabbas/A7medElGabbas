@@ -4,16 +4,16 @@ import Link from "next/link";
 import { ExternalLink, Home } from "lucide-react";
 
 const SECTIONS = [
-  { label: "Site config", href: null, state: "Stage 0" },
-  { label: "Navigation", href: null, state: "Stage 0" },
+  { label: "Site config", href: "/admin/site-config", state: "Stage 3" },
+  { label: "Navigation", href: "/admin/site-config?tab=nav", state: "Stage 3" },
+  { label: "Hero & stats", href: "/admin/hero", state: "Stage 3" },
+  { label: "About", href: "/admin/about", state: "Stage 3" },
+  { label: "Skills", href: "/admin/skills", state: "Stage 3" },
+  { label: "Experience", href: "/admin/experience", state: "Stage 3" },
   { label: "Projects", href: "/admin/projects", state: "Stage 1" },
   { label: "Certificates", href: "/admin/certificates", state: "Stage 1" },
   { label: "Media", href: "/admin/media", state: "Stage 1" },
   { label: "Contact inbox", href: "/admin/contact", state: "Stage 2" },
-  { label: "Hero & stats", href: null, state: "Stage 3" },
-  { label: "About", href: null, state: "Stage 3" },
-  { label: "Skills", href: null, state: "Stage 3" },
-  { label: "Experience", href: null, state: "Stage 3" },
 ] as const;
 
 export default function AdminDashboardClient({
@@ -84,17 +84,16 @@ export default function AdminDashboardClient({
             const className =
               "flex items-center justify-between rounded-lg border border-border px-4 py-3";
 
-            // Sections from a later stage have no route yet, so they stay
-            // inert instead of linking to a 404.
-            return section.href ? (
+            // Every section now has a route (Stage 3 completed the set), so
+            // there is no inert branch left to render.
+            return (
               <li key={section.label}>
-                <Link href={section.href} className={`${className} transition-colors hover:border-accent-gold hover:bg-accent/10`}>
+                <Link
+                  href={section.href}
+                  className={`${className} transition-colors hover:border-accent-gold hover:bg-accent/10`}
+                >
                   {body}
                 </Link>
-              </li>
-            ) : (
-              <li key={section.label} className={className}>
-                {body}
               </li>
             );
           })}
