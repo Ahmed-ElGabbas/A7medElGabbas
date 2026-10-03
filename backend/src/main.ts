@@ -11,6 +11,20 @@ async function bootstrap(): Promise<void> {
   const config = app.get(ConfigService);
 
   app.use(cookieParser());
+
+  /**
+   * Railway terminates TLS and forwards to this process, so without this every
+   * request appears to come from the proxy's own address. Two things depend on
+   * the real client address: the POST /contact rate limit, which would otherwise
+   * collapse every visitor on the site into a single shared quota, and the IP
+   * digest stored on a submission.
+   *
+   * A numeric trust of 1 means "trust exactly one hop": the proxy's appended
+   * address is used and a client-supplied X-Forwarded-For cannot spoof its way
+   * past the limit. If the topology ever gains a second proxy, raise this to the
+   * hop count rather than switching to `true`.
+   */
+  app.set('trust proxy', 1);
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

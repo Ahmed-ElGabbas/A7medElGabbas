@@ -10,6 +10,7 @@ import { NavModule } from './nav/nav.module';
 import { ProjectsModule } from './projects/projects.module';
 import { CertificatesModule } from './certificates/certificates.module';
 import { MediaModule } from './media/media.module';
+import { ContactModule } from './contact/contact.module';
 import { HealthController } from './health.controller';
 
 @Module({
@@ -22,6 +23,7 @@ import { HealthController } from './health.controller';
     ProjectsModule,
     CertificatesModule,
     MediaModule,
+    ContactModule,
   ],
   controllers: [HealthController],
   providers: [

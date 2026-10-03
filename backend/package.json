@@ -26,6 +26,7 @@
     "@nestjs/core": "^11.1.6",
     "@nestjs/jwt": "^11.0.0",
     "@nestjs/platform-express": "^11.1.6",
+    "@nestjs/throttler": "^6.7.1",
     "@prisma/client": "^6.14.0",
     "bcryptjs": "^3.0.2",
     "class-transformer": "^0.5.1",
@@ -33,6 +34,7 @@
     "cookie-parser": "^1.4.7",
     "dotenv": "^18.0.5",
     "reflect-metadata": "^0.2.2",
+    "resend": "^6.32.0",
     "rxjs": "^7.8.2"
   },
   "devDependencies": {
