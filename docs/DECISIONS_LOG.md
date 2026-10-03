@@ -148,3 +148,118 @@ ignores it when absent.
 Per the plan, replying happens from the visitor's own mail client. The button
 prefills a `Re: <subject>` and sets `reply-to` on the notification to the
 sender's address, so both directions work without an in-app composer.
+
+---
+
+## Stage 3 — Content modules + public cutover + admin UI
+
+### 1. Static fallbacks are kept in `content.ts`, not deleted at cutover
+
+Each loader in `src/lib/content.ts` falls back to `src/data/portfolio.ts` when the
+API is unreachable or returns malformed JSON, and the page is
+`dynamic = "force-dynamic"` so the fetch happens per request rather than at build
+time. The fallback is logged once per loader per process rather than on every
+render, because a page render fans out into 16 loaders and an unreachable backend
+would otherwise produce 16 identical stack traces per visit.
+
+This is deliberate: the plan treats the cutover as reversible per section, so the
+static data stays as the rollback path. The consequence to be aware of is that a
+broken backend degrades to stale content *silently* apart from the server log —
+worth revisiting once the site is on monitoring.
+
+### 2. `SectionMeta` is keyed by string, and the route is `/section-meta/:key`
+
+The original migration created `section_meta` with an autoincrement `id` plus a
+unique `key`. That combination is a trap: the public loader receives `key` (the
+only value the six section components know) while the admin editor receives `id`,
+so any lookup that mixes them silently edits the wrong row. A dedicated migration
+(`20261003095332_fix_section_meta_id`) and a `:key` route parameter remove the
+ambiguity — the key is now the single identifier used on both sides.
+
+The six keys are a closed set (`about`, `skills`, `experience`, `projects`,
+`certificates`, `contact`) and the admin editor presents exactly those six,
+read-only. Adding a seventh row would have no renderer, so the page does not
+offer "add".
+
+### 3. Icons are stored on the row, keyed by a shared string vocabulary
+
+`about.tsx` originally picked a quick-fact icon by array position, so deleting or
+reordering a card in the admin reassigned glyphs to the wrong labels. The same
+class of bug existed for skill-category icons. Both now store an `icon` string
+validated by `@IsIn(...)` against a list that is mirrored in
+`src/lib/content-icons.ts`, and resolved through
+`resolveQuickFactIcon` / `resolveSkillCategoryIcon`. Those resolvers fall back to
+a default glyph for an unknown key, so a bad value degrades instead of throwing
+during render.
+
+The vocabulary is duplicated in two files by necessity — the backend cannot
+import from the frontend — and the DTO comment points at the frontend constant so
+the two stay in sync.
+
+### 4. `education.courses` was a real column that nothing rendered
+
+The public education card showed a hardcoded course list. Editing courses in the
+admin produced no visible change, which is the exact failure the stage is meant to
+eliminate. `courses` is now returned by `GET /experience` and rendered from the
+API. Same root cause as the heading and icon bugs: a data field that no component
+read.
+
+### 5. Reorder is one shared helper, and ids are validated as a complete set
+
+Every reorder endpoint funnels through `backend/src/common/reorder.ts`. It
+rejects a partial or duplicated id list (400) rather than silently renumbering,
+because a drag that drops one row would otherwise leave two rows sharing an order
+value and make the next render non-deterministic.
+
+### 6. Literal routes are declared before their `:id` siblings
+
+`/certificates/stats` and `/certificates/issuing-organizations` are siblings of
+`/certificates/:id`. Express matches in declaration order, so declaring the
+literal paths after the parameterised one would route every request to
+`/certificates/:id`. Both controllers declare literals first, and
+`backend/src/tests/certificate-extras-routes.spec.ts` asserts it explicitly —
+this is a silent 404/500 otherwise, and it is easy to reintroduce.
+
+### 7. Certificate stats and issuing organizations live in the Certificates admin UI
+
+They are separate tables and separate endpoints, but they only ever render inside
+the certificates section, next to the certificate grid. They are therefore edited
+as two collapsible panels inside the existing `/admin/certificates` page rather
+than as their own routes. Keeps the admin IA aligned with how the page is read.
+
+### 8. Site config, social links, nav and headings share one admin page
+
+Same reasoning: all four are global site settings with one row (or one short
+list), and an editor looking for "the site name" should not have to know which
+table it lives in. `/admin/site-config` presents them as four tabs.
+
+The active tab is passed from the server component via `?tab=` rather than read
+with `useSearchParams` in the client, which keeps the page free of the Suspense
+boundary `useSearchParams` requires. This is also what lets the dashboard
+deep-link straight to the Navigation tab.
+
+### 9. Identity fields are edited under Site config, not under Hero & stats
+
+`/admin/hero` only manages the four stat rows. The name, title, headline and
+photo are columns of the `site_config` singleton, which the header and footer read
+too — editing them from a page named "hero" would have two writers for one row.
+
+### 10. A `null` initial payload is reported, not rendered as empty
+
+Every admin page server-fetches its data. A failed fetch yields `null` rather than
+an empty array, so the page can distinguish "no rows yet" from "the API is not
+reachable" and say so. Silently rendering empty forms would read as data loss.
+
+### 11. Public GET routes are `@Public()`; every write stays guarded
+
+The public site is unauthenticated, so the read endpoints for each Stage 3 module
+are public. All `POST`/`PATCH`/`DELETE` routes keep the global `JwtAuthGuard` and
+are exercised as authenticated in the route tests. No write endpoint was opened
+up to make the admin UI work.
+
+### 12. Reordering is optimistic, then reconciled from the server response
+
+`SortableList` reorders locally on drop and the client `PATCH`es the id array.
+On success the client replaces local state with the response body rather than
+trusting its own guess, so the on-screen order is always the server's order. On
+failure the previous order is restored.
