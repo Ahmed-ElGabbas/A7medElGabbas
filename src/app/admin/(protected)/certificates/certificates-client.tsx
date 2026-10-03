@@ -7,6 +7,8 @@ import {
   AdminApiError,
   adminApi,
   type AdminCertificate,
+  type AdminCertificateStat,
+  type AdminIssuingOrganization,
   type CategoryOption,
 } from "@/lib/admin-api";
 import {
@@ -21,6 +23,7 @@ import {
 } from "@/components/admin/field";
 import { MediaField } from "@/components/admin/media-field";
 import { SortableList } from "@/components/admin/sortable-list";
+import { CertificateExtras } from "./certificate-extras";
 
 interface CertificateDraft {
   title: string;
@@ -89,9 +92,13 @@ function toPayload(draft: CertificateDraft) {
 export default function AdminCertificatesClient({
   initialItems,
   initialCategories,
+  initialStats,
+  initialOrganizations,
 }: {
   initialItems: AdminCertificate[] | null;
   initialCategories: CategoryOption[] | null;
+  initialStats: AdminCertificateStat[] | null;
+  initialOrganizations: AdminIssuingOrganization[] | null;
 }) {
   const [items, setItems] = useState<AdminCertificate[]>(initialItems ?? []);
   const [categoryOptions, setCategoryOptions] = useState<CategoryOption[]>(
@@ -412,6 +419,8 @@ export default function AdminCertificatesClient({
           )}
         />
       )}
+
+      <CertificateExtras initialStats={initialStats} initialOrganizations={initialOrganizations} />
     </div>
   );
 }
