@@ -86,6 +86,175 @@ export interface MediaStatus {
   maxUploadBytes: number;
 }
 
+/* ----------------------------- Stage 3 types ---------------------------- */
+/* These mirror the DB row shapes the Stage 3 controllers return. Kept as
+   distinct types from the public ones in @/lib/content because the admin needs
+   the write-side fields (order, ids, nullable FKs) that the public page drops. */
+
+export interface AdminSiteConfig {
+  name: string;
+  firstName: string | null;
+  lastName: string | null;
+  title: string;
+  metaDescription: string;
+  url: string | null;
+  headline: string | null;
+  photoUrl: string | null;
+  resumeUrl: string | null;
+  location: string | null;
+  status: string | null;
+  statusSubtext: string | null;
+  roles: string[];
+}
+
+export interface AdminSocialLinks {
+  email: string;
+  phone: string;
+  github: string;
+  linkedin: string;
+  twitter: string;
+  facebook: string;
+}
+
+export interface SiteConfigPayload {
+  config: AdminSiteConfig | null;
+  links: AdminSocialLinks | null;
+}
+
+export interface AdminNavItem {
+  id: string;
+  label: string;
+  href: string;
+  order: number;
+}
+
+export interface AdminSectionMeta {
+  id: number;
+  key: string;
+  index: string | null;
+  label: string | null;
+  title: string;
+  subtitle: string | null;
+  order: number;
+}
+
+export interface AdminStat {
+  id: string;
+  value: string;
+  label: string;
+  order: number;
+}
+
+export interface AdminAboutContent {
+  id: number;
+  sectionSubtitle: string | null;
+  narrativeTitle: string | null;
+  paragraphs: string[];
+  highlights: string[];
+  academicFocusTitle: string | null;
+  academicFocusDescription: string | null;
+  quickFacts: AdminQuickFact[];
+}
+
+export interface AdminQuickFact {
+  id: string;
+  label: string;
+  value: string;
+  detail: string | null;
+  icon: string | null;
+  order: number;
+}
+
+export interface AdminSkillSpotlight {
+  id: string;
+  categoryId: string;
+  summary: string | null;
+  patterns: string[];
+  primaryProject: string | null;
+}
+
+export interface AdminSkill {
+  id: string;
+  categoryId: string;
+  name: string;
+  order: number;
+}
+
+export interface AdminSkillCategory {
+  id: string;
+  title: string;
+  icon: string | null;
+  order: number;
+  skills: AdminSkill[];
+  spotlight: AdminSkillSpotlight | null;
+}
+
+export interface AdminPhilosophyQuote {
+  id: number;
+  quote: string;
+  author: string | null;
+}
+
+export interface AdminTickerSkill {
+  id: string;
+  label: string;
+  order: number;
+}
+
+export interface SkillsPayload {
+  categories: AdminSkillCategory[];
+  philosophyQuote: AdminPhilosophyQuote | null;
+  tickerSkills: AdminTickerSkill[];
+}
+
+export interface AdminExperience {
+  id: string;
+  role: string;
+  company: string;
+  period: string;
+  description: string;
+  technologies: string[];
+  order: number;
+}
+
+export interface AdminEducation {
+  id: string;
+  degree: string;
+  institution: string;
+  period: string;
+  description: string | null;
+  gpa: string | null;
+  courses: string[];
+  order: number;
+}
+
+export interface AdminFutureGoals {
+  id: number;
+  title: string;
+  description: string | null;
+  items: string[];
+}
+
+export interface ExperiencePayload {
+  experiences: AdminExperience[];
+  education: AdminEducation[];
+  futureGoals: AdminFutureGoals | null;
+}
+
+export interface AdminCertificateStat {
+  id: string;
+  value: string;
+  label: string;
+  desc: string | null;
+  order: number;
+}
+
+export interface AdminIssuingOrganization {
+  id: string;
+  name: string;
+  order: number;
+}
+
 export class AdminApiError extends Error {
   constructor(
     message: string,
@@ -173,6 +342,196 @@ export const adminApi = {
     apiFetch<AdminContactSubmission>(`/contact/submissions/${id}/read`, {
       method: "PATCH",
       body: JSON.stringify({ read }),
+    }),
+
+  /* --------------------------- Stage 3 ------------------------------- */
+
+  /* site config, social links, nav, section headings */
+
+  getSiteConfig: () => apiFetch<SiteConfigPayload>("/site-config"),
+  updateSiteConfig: (body: unknown) =>
+    apiFetch<AdminSiteConfig>("/site-config", { method: "PATCH", body: JSON.stringify(body) }),
+  updateSocialLinks: (body: unknown) =>
+    apiFetch<AdminSocialLinks>("/social-links", { method: "PATCH", body: JSON.stringify(body) }),
+  listNavItems: () => apiFetch<{ items: AdminNavItem[] }>("/nav-items"),
+  createNavItem: (body: unknown) =>
+    apiFetch<AdminNavItem>("/nav-items", { method: "POST", body: JSON.stringify(body) }),
+  updateNavItem: (id: string, body: unknown) =>
+    apiFetch<AdminNavItem>(`/nav-items/${id}`, { method: "PATCH", body: JSON.stringify(body) }),
+  deleteNavItem: (id: string) => apiFetch<void>(`/nav-items/${id}`, { method: "DELETE" }),
+  reorderNavItems: (ids: string[]) =>
+    apiFetch<{ items: AdminNavItem[] }>("/nav-items/reorder", {
+      method: "PATCH",
+      body: JSON.stringify({ ids, startOrder: 0 }),
+    }),
+  listSectionMeta: () => apiFetch<{ items: AdminSectionMeta[] }>("/section-meta"),
+  updateSectionMeta: (key: string, body: unknown) =>
+    apiFetch<AdminSectionMeta>(`/section-meta/${key}`, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    }),
+
+  /* hero stats */
+
+  listStats: () => apiFetch<{ items: AdminStat[] }>("/stats"),
+  createStat: (body: unknown) =>
+    apiFetch<AdminStat>("/stats", { method: "POST", body: JSON.stringify(body) }),
+  updateStat: (id: string, body: unknown) =>
+    apiFetch<AdminStat>(`/stats/${id}`, { method: "PATCH", body: JSON.stringify(body) }),
+  deleteStat: (id: string) => apiFetch<void>(`/stats/${id}`, { method: "DELETE" }),
+  reorderStats: (ids: string[]) =>
+    apiFetch<{ items: AdminStat[] }>("/stats/reorder", {
+      method: "PATCH",
+      body: JSON.stringify({ ids, startOrder: 0 }),
+    }),
+
+  /* about + quick facts */
+
+  getAbout: () => apiFetch<AdminAboutContent>("/about"),
+  updateAbout: (body: unknown) =>
+    apiFetch<AdminAboutContent>("/about", { method: "PATCH", body: JSON.stringify(body) }),
+  createQuickFact: (body: unknown) =>
+    apiFetch<AdminQuickFact>("/about/quick-facts", {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+  updateQuickFact: (id: string, body: unknown) =>
+    apiFetch<AdminQuickFact>(`/about/quick-facts/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    }),
+  deleteQuickFact: (id: string) => apiFetch<void>(`/about/quick-facts/${id}`, { method: "DELETE" }),
+  reorderQuickFacts: (ids: string[]) =>
+    apiFetch<AdminAboutContent>("/about/quick-facts/reorder", {
+      method: "PATCH",
+      body: JSON.stringify({ ids, startOrder: 0 }),
+    }),
+
+  /* skills */
+
+  getSkills: () => apiFetch<SkillsPayload>("/skills"),
+  createSkillCategory: (body: unknown) =>
+    apiFetch<AdminSkillCategory>("/skill-categories", {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+  updateSkillCategory: (id: string, body: unknown) =>
+    apiFetch<AdminSkillCategory>(`/skill-categories/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    }),
+  deleteSkillCategory: (id: string) =>
+    apiFetch<void>(`/skill-categories/${id}`, { method: "DELETE" }),
+  reorderSkillCategories: (ids: string[]) =>
+    apiFetch<SkillsPayload>("/skill-categories/reorder", {
+      method: "PATCH",
+      body: JSON.stringify({ ids, startOrder: 0 }),
+    }),
+  createSkill: (categoryId: string, body: unknown) =>
+    apiFetch<AdminSkill>(`/skill-categories/${categoryId}/skills`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+  updateSkill: (categoryId: string, id: string, body: unknown) =>
+    apiFetch<AdminSkill>(`/skill-categories/${categoryId}/skills/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    }),
+  deleteSkill: (categoryId: string, id: string) =>
+    apiFetch<void>(`/skill-categories/${categoryId}/skills/${id}`, { method: "DELETE" }),
+  reorderSkills: (categoryId: string, ids: string[]) =>
+    apiFetch<AdminSkill[]>(`/skill-categories/${categoryId}/skills/reorder`, {
+      method: "PATCH",
+      body: JSON.stringify({ ids, startOrder: 0 }),
+    }),
+  updateSpotlight: (categoryId: string, body: unknown) =>
+    apiFetch<AdminSkillSpotlight>(`/skill-categories/${categoryId}/spotlight`, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    }),
+  updatePhilosophyQuote: (body: unknown) =>
+    apiFetch<AdminPhilosophyQuote>("/philosophy-quote", {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    }),
+  createTickerSkill: (body: unknown) =>
+    apiFetch<AdminTickerSkill>("/ticker-skills", { method: "POST", body: JSON.stringify(body) }),
+  updateTickerSkill: (id: string, body: unknown) =>
+    apiFetch<AdminTickerSkill>(`/ticker-skills/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    }),
+  deleteTickerSkill: (id: string) => apiFetch<void>(`/ticker-skills/${id}`, { method: "DELETE" }),
+  reorderTickerSkills: (ids: string[]) =>
+    apiFetch<{ items: AdminTickerSkill[] }>("/ticker-skills/reorder", {
+      method: "PATCH",
+      body: JSON.stringify({ ids, startOrder: 0 }),
+    }),
+
+  /* experience, education, future goals */
+
+  getExperience: () => apiFetch<ExperiencePayload>("/experience"),
+  createExperience: (body: unknown) =>
+    apiFetch<AdminExperience>("/experiences", { method: "POST", body: JSON.stringify(body) }),
+  updateExperience: (id: string, body: unknown) =>
+    apiFetch<AdminExperience>(`/experiences/${id}`, { method: "PATCH", body: JSON.stringify(body) }),
+  deleteExperience: (id: string) => apiFetch<void>(`/experiences/${id}`, { method: "DELETE" }),
+  reorderExperiences: (ids: string[]) =>
+    apiFetch<ExperiencePayload>("/experiences/reorder", {
+      method: "PATCH",
+      body: JSON.stringify({ ids, startOrder: 0 }),
+    }),
+  createEducation: (body: unknown) =>
+    apiFetch<AdminEducation>("/education", { method: "POST", body: JSON.stringify(body) }),
+  updateEducation: (id: string, body: unknown) =>
+    apiFetch<AdminEducation>(`/education/${id}`, { method: "PATCH", body: JSON.stringify(body) }),
+  deleteEducation: (id: string) => apiFetch<void>(`/education/${id}`, { method: "DELETE" }),
+  reorderEducation: (ids: string[]) =>
+    apiFetch<ExperiencePayload>("/education/reorder", {
+      method: "PATCH",
+      body: JSON.stringify({ ids, startOrder: 0 }),
+    }),
+  updateFutureGoals: (body: unknown) =>
+    apiFetch<AdminFutureGoals>("/future-goals", { method: "PATCH", body: JSON.stringify(body) }),
+
+  /* certificate stats + issuing organizations */
+
+  listCertificateStats: () => apiFetch<{ items: AdminCertificateStat[] }>("/certificates/stats"),
+  createCertificateStat: (body: unknown) =>
+    apiFetch<AdminCertificateStat>("/certificates/stats", {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+  updateCertificateStat: (id: string, body: unknown) =>
+    apiFetch<AdminCertificateStat>(`/certificates/stats/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    }),
+  deleteCertificateStat: (id: string) =>
+    apiFetch<void>(`/certificates/stats/${id}`, { method: "DELETE" }),
+  reorderCertificateStats: (ids: string[]) =>
+    apiFetch<{ items: AdminCertificateStat[] }>("/certificates/stats/reorder", {
+      method: "PATCH",
+      body: JSON.stringify({ ids, startOrder: 0 }),
+    }),
+  listIssuingOrganizations: () =>
+    apiFetch<{ items: AdminIssuingOrganization[] }>("/certificates/issuing-organizations"),
+  createIssuingOrganization: (body: unknown) =>
+    apiFetch<AdminIssuingOrganization>("/certificates/issuing-organizations", {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+  updateIssuingOrganization: (id: string, body: unknown) =>
+    apiFetch<AdminIssuingOrganization>(`/certificates/issuing-organizations/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    }),
+  deleteIssuingOrganization: (id: string) =>
+    apiFetch<void>(`/certificates/issuing-organizations/${id}`, { method: "DELETE" }),
+  reorderIssuingOrganizations: (ids: string[]) =>
+    apiFetch<{ items: AdminIssuingOrganization[] }>("/certificates/issuing-organizations/reorder", {
+      method: "PATCH",
+      body: JSON.stringify({ ids, startOrder: 0 }),
     }),
 };
 
