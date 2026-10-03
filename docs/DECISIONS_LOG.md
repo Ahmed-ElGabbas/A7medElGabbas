@@ -263,3 +263,78 @@ up to make the admin UI work.
 On success the client replaces local state with the response body rather than
 trusting its own guess, so the on-screen order is always the server's order. On
 failure the previous order is restored.
+
+---
+
+## Stage 4 — Railway deployment
+
+### 1. `engines.node` is declared in *both* `package.json` files
+
+The first production build provisioned **Node 18.20.5** and ran the whole NestJS
+11 app on it. Nothing failed — the service booted, `PrismaService` connected, and
+the health check passed — which is exactly what makes this worth recording.
+NestJS 11 requires Node >= 20, so the first deploy was an unsupported runtime
+that happened to work.
+
+The cause is that Nixpacks picks the Node version from the **repository root**
+`package.json`, and this is a monorepo whose root is the Next.js frontend. With
+no `engines` field it fell back to the Nixpacks default of Node 18. Declaring
+`engines.node` only in `backend/package.json` would have been the obvious fix and
+would have done nothing, because the backend's `package.json` is never consulted
+during the setup phase. Both files now declare `>=20`.
+
+Residual, accepted: several *frontend* dependencies (`@tailwindcss/oxide`,
+`undici`, `shadcn`, `next` 16) declare `>=22`, so they keep emitting `EBADENGINE`
+warnings during the backend build's install phase. Those are warnings on packages
+we are not using at build time, and they disappear if the range is later raised.
+
+### 2. Railway build config lives in the repo root and `cd`s into `backend/`
+
+The dashboard's "Root Directory" field is the intended way to point a service at
+`backend/`, but it could not be edited, and the Railway config schema has no
+`rootDirectory` key (it is a dashboard-only setting) and the CLI has no matching
+flag. The workaround is a root-level `railway.json` whose commands `cd backend`
+first, with the builder set to `NIXPACKS` so `railway.json` is honoured at all.
+
+The cost is that Nixpacks still runs its own `npm ci` against the **frontend**
+root before our build command, so the backend build pays for a Next.js install it
+does not need. A root `Dockerfile` would avoid this and is the better long-term
+answer, but it is a larger change than this deployment needed.
+
+Worth knowing: `railway service status --json` reports the dashboard's stored
+settings (`builder: RAILPACK`, `buildCommand: null`) while the build is still
+running, which looks like the config was ignored. It is misleading — the Nixpacks
+plan banner in `railway logs --build` is the authoritative signal that
+`railway.json` was applied.
+
+### 3. `--include=dev` is mandatory in the build command
+
+Railway sets `NODE_ENV=production` for the build, which makes npm resolve
+`omit=dev`. A plain `npm ci` in `backend/` therefore drops `@nestjs/cli` and
+`prisma`, and `nest build` / `prisma generate` both fail with a missing-binary
+error. The build command uses `npm ci --include=dev` to force them back in.
+
+### 4. Seed runs manually over SSH, and `ADMIN_*` are never Railway variables
+
+`preDeployCommand` runs `prisma migrate deploy` only. `prisma db seed` is
+deliberately **not** in it: `seed.ts` upserts the admin row and rewrites its
+password hash, so running it on every deploy would silently revert any password
+change made through the admin UI.
+
+For the same reason `ADMIN_EMAIL` and `ADMIN_PASSWORD` are not stored as Railway
+variables, matching the "local only" note in `backend/.env.example`. They are
+supplied inline for a single `railway ssh` invocation instead, so the credentials
+exist in exactly one place at exactly one moment.
+
+### 5. `railway.json` is deprecated in favour of `.railway/railway.ts`
+
+Every Railway CLI call now emits:
+
+> Config as Code (railway.json / railway.toml) is deprecated. Prefer
+> Infrastructure as Code (.railway/railway.ts). Existing files keep working
+> until 2026-12-01.
+
+The current file works and this deployment is unaffected, so no migration is
+attempted now. **Action required before 2026-12-01:** either run
+`railway config migrate` or hand-write `.railway/railway.ts` for
+`portfolio-backend`. Deliberately deferred rather than done mid-deployment.
