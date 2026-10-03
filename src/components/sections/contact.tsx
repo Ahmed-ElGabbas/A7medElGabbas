@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { submitContact } from "@/lib/contact-api";
 import {
   Mail,
   Phone,
@@ -15,6 +16,7 @@ import {
   Facebook,
   MessageSquare,
   Clock,
+  AlertCircle,
 } from "lucide-react";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Card, CardContent } from "@/components/ui/card";
@@ -26,11 +28,14 @@ import { siteConfig } from "@/config/site";
 export default function Contact() {
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [formStatus, setFormStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     subject: "",
     message: "",
+    // Honeypot. Off-screen and never filled in by a real visitor.
+    website: "",
   });
 
   const handleCopyEmail = () => {
@@ -39,16 +44,31 @@ export default function Contact() {
     setTimeout(() => setCopiedEmail(false), 2500);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormStatus("submitting");
+    setErrorMessage(null);
 
-    // Simulate submission
-    setTimeout(() => {
+    try {
+      await submitContact({
+        name: formData.name,
+        email: formData.email,
+        // The API treats an empty subject as absent, so only send it when filled.
+        subject: formData.subject || undefined,
+        message: formData.message,
+        website: formData.website,
+      });
       setFormStatus("success");
-      setFormData({ name: "", email: "", subject: "", message: "" });
+      setFormData({ name: "", email: "", subject: "", message: "", website: "" });
       setTimeout(() => setFormStatus("idle"), 5000);
-    }, 1000);
+    } catch (error) {
+      setFormStatus("error");
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "Something went wrong. Please try again.",
+      );
+    }
   };
 
   return (
@@ -224,6 +244,26 @@ export default function Contact() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
+                {/*
+                  Honeypot. Positioned off-screen rather than hidden with
+                  `display: none` or `type="hidden"`, because bots skip those
+                  but still fill in a text input they cannot see. `aria-hidden`
+                  and `tabIndex={-1}` keep it out of the accessibility tree and
+                  the tab order, so a real visitor never encounters it.
+                */}
+                <div className="absolute left-[-9999px] top-auto h-px w-px overflow-hidden" aria-hidden="true">
+                  <label htmlFor="contact-website">Leave this field empty</label>
+                  <input
+                    id="contact-website"
+                    name="website"
+                    type="text"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={formData.website}
+                    onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                  />
+                </div>
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <label className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
@@ -278,6 +318,16 @@ export default function Contact() {
                     className="bg-background border-border/70 focus-visible:border-primary text-sm resize-none"
                   />
                 </div>
+
+                {formStatus === "error" && errorMessage && (
+                  <div
+                    role="alert"
+                    className="flex items-start gap-2.5 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-xs sm:text-sm text-destructive"
+                  >
+                    <AlertCircle size={16} className="mt-0.5 shrink-0" />
+                    <span>{errorMessage}</span>
+                  </div>
+                )}
 
                 <div className="pt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <div className="flex items-center gap-2 text-[11px] text-muted-foreground font-mono">
