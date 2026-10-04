@@ -15,6 +15,7 @@ import { HeroModule } from './hero/hero.module';
 import { AboutModule } from './about/about.module';
 import { SkillsModule } from './skills/skills.module';
 import { ExperienceModule } from './experience/experience.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 import { HealthController } from './health.controller';
 
 @Module({
@@ -32,6 +33,7 @@ import { HealthController } from './health.controller';
     AboutModule,
     SkillsModule,
     ExperienceModule,
+    DashboardModule,
   ],
   controllers: [HealthController],
   providers: [
