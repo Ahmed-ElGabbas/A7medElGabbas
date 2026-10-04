@@ -255,6 +255,81 @@ export interface AdminIssuingOrganization {
   order: number;
 }
 
+/* ----------------------------- Dashboard types ---------------------------- */
+/* Mirrors the /dashboard responses. Kept as a discriminated union on `kind` so
+   the activity feed and the search dropdown can pick an icon per row without a
+   second lookup table on the client. */
+
+export type AdminActivityKind =
+  | "project"
+  | "certificate"
+  | "certificate-stat"
+  | "issuing-organization"
+  | "skill-category"
+  | "skill"
+  | "skill-spotlight"
+  | "ticker-skill"
+  | "experience"
+  | "education"
+  | "quick-fact"
+  | "nav-item"
+  | "stat"
+  | "site-config"
+  | "social-links"
+  | "about"
+  | "philosophy-quote"
+  | "future-goals";
+
+export interface AdminActivityEntry {
+  kind: AdminActivityKind;
+  /** Namespaced by kind, so it is unique across tables. */
+  id: string;
+  title: string;
+  section: string;
+  href: string;
+  updatedAt: string;
+}
+
+export interface AdminDashboardCounts {
+  projects: number;
+  certificates: number;
+  skills: number;
+  skillCategories: number;
+  experiences: number;
+  education: number;
+  navItems: number;
+  heroStats: number;
+  quickFacts: number;
+  tickerSkills: number;
+  certificateStats: number;
+  issuingOrganizations: number;
+  mediaAssets: number;
+}
+
+export interface AdminDashboardOverview {
+  counts: AdminDashboardCounts;
+  contact: { total: number; unread: number };
+  activity: AdminActivityEntry[];
+  generatedAt: string;
+}
+
+export type AdminSearchKind = "project" | "certificate" | "submission";
+
+export interface AdminSearchResult {
+  kind: AdminSearchKind;
+  id: string;
+  title: string;
+  subtitle: string;
+  /** Deep link that opens the target row, not just its section. */
+  href: string;
+}
+
+export interface AdminContentBackup {
+  version: number;
+  generatedAt: string;
+  data: Record<string, unknown>;
+}
+
 export class AdminApiError extends Error {
   constructor(
     message: string,
@@ -532,6 +607,32 @@ export const adminApi = {
     apiFetch<{ items: AdminIssuingOrganization[] }>("/certificates/issuing-organizations/reorder", {
       method: "PATCH",
       body: JSON.stringify({ ids, startOrder: 0 }),
+    }),
+
+  /* --------------------------- Dashboard --------------------------- */
+
+  dashboardOverview: (activityLimit = 10) =>
+    apiFetch<AdminDashboardOverview>(`/dashboard/overview?limit=${activityLimit}`),
+
+  /**
+   * Cross-content search for the dashboard header box.
+   *
+   * `q` is trimmed here as well as on the server so a trailing space from a
+   * pasted term does not turn into a request the backend rejects.
+   */
+  dashboardSearch: (q: string) =>
+    apiFetch<{ query: string; results: AdminSearchResult[] }>(
+      `/dashboard/search?q=${encodeURIComponent(q.trim())}`,
+    ),
+
+  /** Full content snapshot. Excludes admin_users and contact_submissions. */
+  exportBackup: () => apiFetch<AdminContentBackup>("/dashboard/export"),
+
+  /** Rotates the signed-in admin's own password; verifies the current one first. */
+  changePassword: (body: { currentPassword: string; newPassword: string }) =>
+    apiFetch<{ success: true }>("/auth/password", {
+      method: "PATCH",
+      body: JSON.stringify(body),
     }),
 };
 

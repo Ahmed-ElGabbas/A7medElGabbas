@@ -87,6 +87,16 @@
   --color-glass-fill-strong: rgba(0, 0, 0, 0.06);
   --color-border-hover: rgba(0, 0, 0, 0.15);
 
+  /* "Liquid glass" panel surfaces (admin dashboard). Declared per theme rather
+     than hardcoded so the shell stays legible if /admin is ever reached with the
+     public site's light preference already in localStorage. */
+  --color-panel-fill: rgba(255, 255, 255, 0.5);
+  --color-panel-fill-hover: rgba(255, 255, 255, 0.72);
+  --color-panel-edge: rgba(184, 150, 12, 0.28);
+  --color-panel-edge-strong: rgba(184, 150, 12, 0.55);
+  --color-panel-sheen: rgba(255, 255, 255, 0.9);
+  --color-panel-shadow: rgba(0, 0, 0, 0.1);
+
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
   --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.1);
@@ -133,6 +143,15 @@
   --color-glass-fill: rgba(255, 255, 255, 0.04);
   --color-glass-fill-strong: rgba(255, 255, 255, 0.08);
   --color-border-hover: rgba(255, 255, 255, 0.16);
+
+  /* Dark counterparts of the panel tokens above. This is the theme /admin
+     normally renders in. */
+  --color-panel-fill: rgba(255, 255, 255, 0.05);
+  --color-panel-fill-hover: rgba(255, 255, 255, 0.09);
+  --color-panel-edge: rgba(212, 175, 55, 0.22);
+  --color-panel-edge-strong: rgba(212, 175, 55, 0.55);
+  --color-panel-sheen: rgba(255, 255, 255, 0.16);
+  --color-panel-shadow: rgba(0, 0, 0, 0.55);
 
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
@@ -236,6 +255,79 @@
     box-shadow: 0 0 16px rgba(212, 175, 55, 0.15);
   }
 
+  /* ==========================================================================
+     Liquid-glass panels — the admin dashboard shell.
+
+     Deliberately additive: `.glass-card` above is untouched, so the section
+     manager pages keep their current look. These are the heavier variant —
+     more blur, a gold-tinted 1px edge, and an inset top highlight that reads as
+     light catching a glass bevel.
+
+       .glass-panel      card surface (stat tiles, activity feed, dialogs)
+       .glass-panel-lift same, plus a hover treatment for clickable cards
+       .glass-sidebar    the persistent left rail: flatter, no hover state
+       .gold-hairline    1px gold divider used inside panels
+     ========================================================================== */
+
+  .glass-panel,
+  .glass-panel-lift,
+  .glass-sidebar {
+    position: relative;
+    background: var(--color-panel-fill);
+    border: 1px solid var(--color-panel-edge);
+    backdrop-filter: blur(24px) saturate(150%);
+    -webkit-backdrop-filter: blur(24px) saturate(150%);
+    box-shadow:
+      /* top bevel highlight */
+      inset 0 1px 0 0 var(--color-panel-sheen),
+      /* keeps the lower edge from dissolving into the grid overlay */
+      inset 0 -1px 0 0 rgba(0, 0, 0, 0.25),
+      0 8px 32px -8px var(--color-panel-shadow);
+    @apply rounded-2xl;
+    transition:
+      background 300ms var(--ease-out-expo),
+      border-color 300ms var(--ease-out-expo),
+      box-shadow 300ms var(--ease-out-expo),
+      transform 300ms var(--ease-out-expo);
+  }
+
+  /* Slightly tighter radius for the full-height rail, which reads better as a
+     single continuous surface than as a floating card. */
+  .glass-sidebar {
+    border-radius: 0;
+    border-width: 0 1px 0 0;
+    border-color: var(--color-panel-edge);
+    box-shadow: 8px 0 32px -12px var(--color-panel-shadow);
+  }
+
+  .glass-panel-lift:hover {
+    background: var(--color-panel-fill-hover);
+    border-color: var(--color-panel-edge-strong);
+    box-shadow:
+      inset 0 1px 0 0 var(--color-panel-sheen),
+      inset 0 -1px 0 0 rgba(0, 0, 0, 0.25),
+      0 14px 40px -10px var(--color-panel-shadow),
+      0 0 24px -6px rgba(212, 175, 55, 0.22);
+    transform: translateY(-2px);
+  }
+
+  .glass-panel-lift:focus-visible {
+    outline: 2px solid var(--color-accent-gold);
+    outline-offset: 2px;
+  }
+
+  .gold-hairline {
+    height: 1px;
+    border: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--color-panel-edge) 20%,
+      var(--color-panel-edge) 80%,
+      transparent 100%
+    );
+  }
+
   /* Grid background overlay */
   .grid-overlay {
     position: fixed;
@@ -310,5 +402,17 @@
   .grid-overlay,
   .grid-overlay::before {
     animation: none;
+  }
+
+  /* The dashboard panels lift on hover; drop the movement but keep the colour
+     and glow change, which carries no motion. */
+  .glass-panel,
+  .glass-panel-lift,
+  .glass-sidebar {
+    transition: none;
+  }
+
+  .glass-panel-lift:hover {
+    transform: none;
   }
 }

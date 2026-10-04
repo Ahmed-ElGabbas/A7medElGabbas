@@ -19,6 +19,7 @@ import {
 } from "@/components/admin/field";
 import { MediaField } from "@/components/admin/media-field";
 import { SortableList } from "@/components/admin/sortable-list";
+import { useOpenDeepLink } from "@/components/admin/use-open-deep-link";
 
 interface ProjectDraft {
   title: string;
@@ -72,9 +73,15 @@ function toPayload(draft: ProjectDraft) {
 export default function AdminProjectsClient({
   initialItems,
   initialCategories,
+  deepLinkId = null,
+  openNew = false,
 }: {
   initialItems: AdminProject[] | null;
   initialCategories: string[] | null;
+  /** `?id=` from the dashboard search — opens that project's editor. */
+  deepLinkId?: string | null;
+  /** `?new=1` from the dashboard quick action — opens a blank draft. */
+  openNew?: boolean;
 }) {
   const [items, setItems] = useState<AdminProject[]>(initialItems ?? []);
   const [categories, setCategories] = useState<string[]>(initialCategories ?? []);
@@ -167,6 +174,15 @@ export default function AdminProjectsClient({
       setError(caught instanceof Error ? caught.message : "Could not delete the project.");
     }
   }
+
+  useOpenDeepLink({
+    items,
+    targetId: deepLinkId,
+    openNew,
+    startEdit,
+    startCreate,
+    onUnresolved: () => setNotice("That project no longer exists — showing the full list."),
+  });
 
   return (
     <div className="mx-auto max-w-4xl px-5 py-10 sm:px-8">

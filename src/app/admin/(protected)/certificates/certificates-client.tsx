@@ -23,6 +23,7 @@ import {
 } from "@/components/admin/field";
 import { MediaField } from "@/components/admin/media-field";
 import { SortableList } from "@/components/admin/sortable-list";
+import { useOpenDeepLink } from "@/components/admin/use-open-deep-link";
 import { CertificateExtras } from "./certificate-extras";
 
 interface CertificateDraft {
@@ -94,11 +95,17 @@ export default function AdminCertificatesClient({
   initialCategories,
   initialStats,
   initialOrganizations,
+  deepLinkId = null,
+  openNew = false,
 }: {
   initialItems: AdminCertificate[] | null;
   initialCategories: CategoryOption[] | null;
   initialStats: AdminCertificateStat[] | null;
   initialOrganizations: AdminIssuingOrganization[] | null;
+  /** `?id=` from the dashboard search — opens that certificate's editor. */
+  deepLinkId?: string | null;
+  /** `?new=1` from the dashboard quick action — opens a blank draft. */
+  openNew?: boolean;
 }) {
   const [items, setItems] = useState<AdminCertificate[]>(initialItems ?? []);
   const [categoryOptions, setCategoryOptions] = useState<CategoryOption[]>(
@@ -191,6 +198,15 @@ export default function AdminCertificatesClient({
       setError(caught instanceof Error ? caught.message : "Could not delete the certificate.");
     }
   }
+
+  useOpenDeepLink({
+    items,
+    targetId: deepLinkId,
+    openNew,
+    startEdit,
+    startCreate,
+    onUnresolved: () => setNotice("That certificate no longer exists — showing the full list."),
+  });
 
   return (
     <div className="mx-auto max-w-4xl px-5 py-10 sm:px-8">
