@@ -394,5 +394,85 @@ unaffected. Two things raise the stakes beyond the deadline, though:
 
 **Action required before 2026-12-01:** run `railway config migrate`, or hand-write
 `.railway/railway.ts` for `portfolio-backend`. Deferred for now because it is a
-project-wide change that also manages variables and resources, and it should not
-be attempted in the middle of bringing the service up.
+project-wide change that also manages variables and resources, and it should not be
+attempted in the middle of bringing the service up.
+
+---
+
+## Admin dashboard + password-change session revocation
+
+### 1. Session revocation is a `tokenVersion` counter, not a session table
+
+Both tokens are stateless JWTs, so "revoke the other sessions" had no server-side
+state to act on. The options were a per-token revocation table (a row per issued
+refresh token, deleted or flagged on change) or a version counter.
+
+A counter was chosen: one `INTEGER NOT NULL DEFAULT 0` column on `admin_users`,
+embedded in issued tokens as `ver` and compared in `refresh()`. The whole cost is
+one indexed integer read on a path that already reads the admin row, and there is no
+table to grow, garbage-collect, or migrate. The trade-off is that revocation is
+**per-account, not per-session**: it cannot end exactly one session without ending
+them all, which is also why `logout()` still only clears cookies (it cannot revoke
+just its own token without the table this approach avoids).
+
+### 2. Revocation takes effect on refresh, not on the next request
+
+`AuthGuard` verifies the access token's signature and never queries the database,
+so an access token issued before a password change stays valid until it expires —
+`JWT_ACCESS_EXPIRES_IN`, one hour by default. Revocation is therefore immediate for
+*refreshing* and bounded by the access-token TTL for *in-flight* requests.
+
+Making access tokens revocable immediately would mean a `tokenVersion` read on
+every authenticated request, or a denylist of live access-token ids. Neither was
+taken: an hour of residual validity on a single-admin portfolio is a reasonable
+window for the exposure being addressed (someone else holding a copied refresh
+cookie), and the per-request database read would tax the entire admin API to
+shorten it.
+
+### 3. The device that changes the password stays signed in
+
+The version bump would otherwise strand the caller too — their own cookies carry
+the pre-bump `ver`, so their next silent refresh would be refused and they would be
+bounced to the login form immediately after a successful change. `changePassword`
+therefore returns a freshly minted pair and the controller re-sets both cookies.
+Signing the caller out instead was the simpler alternative the user explicitly
+allowed, but it reads as a bug from inside the dialog that just reported success.
+
+### 4. The bump is an `increment`, in the same UPDATE as the hash
+
+`tokenVersion: { increment: 1 }` shares one statement with the new `passwordHash`,
+so there is no window in which the new password is live but old sessions still
+refresh. Setting a fixed value (`tokenVersion: 1`) would let two concurrent changes
+land on the same version and leave the first one's tokens valid.
+
+### 5. Tokens predating the migration are treated as revoked
+
+Tokens issued before `token_version` existed carry no `ver`, and `undefined !== 0`,
+so `refresh()` refuses them. Adding the column therefore signs out every
+already-issued session exactly once. That is the desired direction for a revocation
+mechanism — sessions cannot outlive the deploy that introduces one — but it is a
+one-time forced sign-out on deploy and should not be a surprise.
+
+### 6. `prisma/seed.ts` bumps the version too
+
+Re-seeding rewrites `passwordHash`, which is a password change by another path, so
+it must revoke too. Without the bump, a seeded password reset would leave every old
+refresh token working — precisely the case where you most want them dead.
+
+### 7. A revoked session is reported distinctly from a malformed token
+
+`refresh()` throws `Session has been revoked. Please sign in again.` rather than
+reusing the generic invalid-token message. The frontend middleware already redirects
+to login and deletes the refresh cookie on any failed refresh, so the behaviour was
+correct either way — but a revoked session surfacing to the owner as an unexplained
+logout loop would be indistinguishable from a bug.
+
+### 8. `?limit=all` returns the default feed, not a 400
+
+Worth recording because it looks like a validation gap and is not one. The global
+`ValidationPipe` transforms with `transform: true`, so `?limit=all` is coerced to
+`NaN`; Nest's `DefaultValuePipe` substitutes its default for `NaN` **by design**
+(`isNil(value) || (isNumber(value) && isNaN(value))`), so the handler receives the
+default `10`. `?limit=1.5` still fails with 400 because `1.5` is a real number that
+`ParseIntPipe` rejects. All three behaviours are pinned by tests in
+`dashboard-routes.spec.ts` rather than left to be rediscovered.
