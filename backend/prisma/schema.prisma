@@ -35,6 +35,10 @@ model AdminUser {
   email        String   @unique
   /// bcrypt hash only. Plaintext is never stored, logged, or committed.
   passwordHash String   @map("password_hash")
+  /// Bumped on every password change and embedded in issued tokens as `ver`.
+  /// Tokens whose `ver` no longer matches are refused, which is what makes a
+  /// password change revoke every session that was opened with the old one.
+  tokenVersion Int      @default(0) @map("token_version")
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 

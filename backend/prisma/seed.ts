@@ -230,7 +230,11 @@ async function seedAdmin(): Promise<void> {
   const passwordHash = await bcrypt.hash(password, 12);
   const admin = await prisma.adminUser.upsert({
     where: { email },
-    update: { passwordHash },
+    // Re-seeding rewrites the password, so it is a password change by another
+    // path and must invalidate sessions opened with the previous one. Without
+    // the bump, a seeded reset would leave old refresh tokens working — the one
+    // case where you most want them dead.
+    update: { passwordHash, tokenVersion: { increment: 1 } },
     create: { email, passwordHash },
   });
 
