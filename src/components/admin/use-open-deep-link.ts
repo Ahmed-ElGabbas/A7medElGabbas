@@ -72,17 +72,3 @@ export function useOpenDeepLink<T extends { id: string }>({
     callbacksRef.current.startEdit(match);
   }, [items, targetId, openNew]);
 }
-
-/** Reads the two params the dashboard links with, out of a page's searchParams. */
-export function readDeepLinkParams(params: {
-  id?: string | string[];
-  new?: string | string[];
-}): { targetId: string | null; openNew: boolean } {
-  const first = (value: string | string[] | undefined): string =>
-    (Array.isArray(value) ? value[0] : value)?.trim() ?? "";
-
-  return {
-    targetId: first(params.id) || null,
-    openNew: first(params.new) === "1",
-  };
-}

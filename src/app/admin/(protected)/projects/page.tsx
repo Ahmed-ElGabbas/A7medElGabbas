@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { adminServerFetch } from "@/lib/admin-session";
-import { readDeepLinkParams } from "@/components/admin/use-open-deep-link";
+import { readDeepLinkParams } from "@/lib/admin-deep-link";
 import type { AdminProject } from "@/lib/admin-api";
 import AdminProjectsClient from "./projects-client";
 
